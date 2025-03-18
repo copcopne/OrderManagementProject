@@ -4,39 +4,52 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
-/**
- * JavaFX App
- */
 public class App extends Application {
 
-    private static Scene scene;
+    private static Stage primaryStage;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("login"));
-        stage.setTitle("Quản lý");
-        stage.setResizable(false);
-        stage.initStyle(StageStyle.UTILITY);
-        stage.setScene(scene);
-        stage.show();
+        primaryStage = stage;
+        primaryStage.setTitle("Quản lý đơn hàng");
+        primaryStage.setResizable(false);
+
+        // Gọi cửa sổ đăng nhập
+        showLoginStage();
     }
 
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
+    // Hiển thị cửa sổ đăng nhập
+    private void showLoginStage() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
+        Parent root = loader.load();
+        Stage loginStage = new Stage();
+        loginStage.setTitle("Đăng nhập");
+        loginStage.initModality(Modality.APPLICATION_MODAL);
+        loginStage.setResizable(false);
+        loginStage.setScene(new Scene(root));
+
+        // Truyền tham chiếu của cửa sổ chính vào controller đăng nhập
+        LoginController loginController = loader.getController();
+        loginController.setMainApp(this, loginStage);
+
+        loginStage.show();
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+    // Hiển thị cửa sổ chính sau khi đăng nhập thành công
+    public void showMainStage() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("primary.fxml"));
+        Parent root = loader.load();
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
     }
-
+        
     public static void main(String[] args) {
         launch();
     }
-
+    
 }
