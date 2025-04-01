@@ -4,13 +4,15 @@
  */
 package com.si.ordermanagementproject;
 
+import com.si.pojo.User;
+
 /**
  *
  * @author copcopne
  */
 public class UserSession {
     private static UserSession instance;
-    private String username;
+    private User currentUser;
     private boolean loggedIn;
     
     private UserSession() {
@@ -24,13 +26,13 @@ public class UserSession {
         return instance;
     }
     
-    public void login(String username) {
-        this.username = username;
+    public void login(User user) {
+        this.currentUser = user;
         this.loggedIn = true;
     }
     
     public void logout() {
-        this.username = null;
+        this.currentUser = null;
         this.loggedIn = false;
     }
     
@@ -38,7 +40,18 @@ public class UserSession {
         return this.loggedIn;
     }
     
+    public boolean isAdmin() {
+        return this.getCurrentUser().isAdmin();
+    }
+    
     public String getUsername() {
-        return this.username;
+        return this.getCurrentUser().getFullName();
+    }
+
+    /**
+     * @return the currentUser
+     */
+    public User getCurrentUser() {
+        return currentUser;
     }
 }
