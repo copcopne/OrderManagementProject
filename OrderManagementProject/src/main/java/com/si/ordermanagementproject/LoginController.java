@@ -2,7 +2,6 @@ package com.si.ordermanagementproject;
 
 import com.si.pojo.User;
 import com.si.services.AuthServices;
-import com.si.services.PasswordHasher;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
