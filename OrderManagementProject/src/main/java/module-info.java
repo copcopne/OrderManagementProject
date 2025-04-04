@@ -5,4 +5,6 @@ module com.si.ordermanagementproject {
 
     opens com.si.ordermanagementproject to javafx.fxml;
     exports com.si.ordermanagementproject;
+    exports com.si.services;
+    exports com.si.pojo;
 }

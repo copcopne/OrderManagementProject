@@ -22,6 +22,41 @@ public class Product {
         this.UnitPrice = UnitPrice;
         this.MinStockLevel = MinStockLevel;
     }
+
+    /**
+     * @return the SKU
+     */
+    public String getSKU() {
+        return SKU;
+    }
+
+    /**
+     * @return the ProductName
+     */
+    public String getProductName() {
+        return ProductName;
+    }
+
+    /**
+     * @return the StockQuanity
+     */
+    public int getStockQuanity() {
+        return StockQuanity;
+    }
+
+    /**
+     * @return the UnitPrice
+     */
+    public float getUnitPrice() {
+        return UnitPrice;
+    }
+
+    /**
+     * @return the MinStockLevel
+     */
+    public int getMinStockLevel() {
+        return MinStockLevel;
+    }
     
     
 }

@@ -47,7 +47,7 @@ public class ProductServices {
         } catch (SQLException ex) {
             Logger.getLogger(ProductServices.class.getName()).log(Level.SEVERE, null, ex);
         }
-            
+            System.out.println("Found " + results.size() + " products.");
             return results;
     }
 }

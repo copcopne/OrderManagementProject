@@ -1,9 +1,55 @@
 package com.si.ordermanagementproject;
 
-import java.io.IOException;
+import com.si.pojo.Product;
+import com.si.services.ProductServices;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 
-public class InventoryManagementController {
+public class InventoryManagementController implements Initializable{
+    @FXML TableView<Product> tbProducts;
+    @FXML TextField txtSearch;
     
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        
+        loadColumns();
+        loadData(null);
+        
+        this.txtSearch.textProperty().addListener(e -> {
+            loadData(this.txtSearch.getText());
+        });
+    }    
+    
+    public void loadData(String kw) {
+        ProductServices p = new ProductServices();
+        List<Product> products = p.getProducts(kw);
+        tbProducts.setItems(FXCollections.observableList(products));
+    }
+     public void loadColumns() {
+        TableColumn colSKU = new TableColumn("Mã SKU");
+        colSKU.setCellValueFactory(new PropertyValueFactory("SKU"));
+        
+        TableColumn colProductName = new TableColumn("Tên sản phẩm");
+        colProductName.setCellValueFactory(new PropertyValueFactory("ProductName"));
+        
+        TableColumn colStockQuanity = new TableColumn("Số lượng");
+        colStockQuanity.setCellValueFactory(new PropertyValueFactory("StockQuanity"));
+        
+        TableColumn colUnitPrice = new TableColumn("Đơn giá");
+        colUnitPrice.setCellValueFactory(new PropertyValueFactory("UnitPrice"));
+        
+        TableColumn colMinStockLevel = new TableColumn("Tồn kho tối thiểu");
+        colMinStockLevel.setCellValueFactory(new PropertyValueFactory("MinStockLevel"));
+        
+        this.tbProducts.getColumns().addAll(colSKU, colProductName, colStockQuanity, colUnitPrice, colMinStockLevel);
+    }
 }
