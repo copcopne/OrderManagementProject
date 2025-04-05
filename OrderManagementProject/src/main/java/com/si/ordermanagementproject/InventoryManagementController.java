@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -20,7 +21,6 @@ public class InventoryManagementController implements Initializable{
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
         loadColumns();
         loadData(null);
         
@@ -33,6 +33,7 @@ public class InventoryManagementController implements Initializable{
         ProductServices p = new ProductServices();
         List<Product> products = p.getProducts(kw);
         tbProducts.setItems(FXCollections.observableList(products));
+        applyRowStyling();
     }
      public void loadColumns() {
         TableColumn colSKU = new TableColumn("Mã SKU");
@@ -52,4 +53,17 @@ public class InventoryManagementController implements Initializable{
         
         this.tbProducts.getColumns().addAll(colSKU, colProductName, colStockQuanity, colUnitPrice, colMinStockLevel);
     }
+     
+     public void applyRowStyling(){
+        tbProducts.setRowFactory(tv -> new TableRow<Product>(){
+            @Override
+            protected void updateItem(Product p, boolean bln) {
+                super.updateItem(p, bln);
+                if (!bln && p != null && p.getStockQuanity() < p.getMinStockLevel()) {
+                    setStyle("-fx-background-color: #ff9999;");
+                }
+             }
+             
+         });
+     }
 }
