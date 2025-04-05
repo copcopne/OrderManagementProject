@@ -25,6 +25,7 @@ public class InventoryManagementController implements Initializable{
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        tbProducts.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         loadColumns();
         loadData(null);
         
