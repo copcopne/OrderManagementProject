@@ -6,6 +6,7 @@ package com.si.services;
 
 import com.si.pojo.JdbcUtils;
 import com.si.pojo.Order;
+import com.si.pojo.OrderDetail;
 import com.si.pojo.OrderStatus;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,33 +22,46 @@ import java.util.logging.Logger;
  * @author ttuan
  */
 public class OrderServices {
-    public List<Order> getOrder(String kw){
+    public List<Order> getOrder(String kw, OrderStatus s){
             List<Order> results = new ArrayList<>();
             try(Connection conn = JdbcUtils.getConn()) {
-            String sql;
-            PreparedStatement stm;
+            String sql = "SELECT * FROM orders WHERE 1=1"
+                    +(s==OrderStatus.ALL ? "":" AND OrderStatus = ?")
+                    +(kw==null||kw.isEmpty()?"":" AND (OrderID LIKE CONCAT('%', ?, '%') OR CustomerID LIKE CONCAT('%', ?, '%'))");
+            PreparedStatement stm = conn.prepareStatement(sql);
+            int paramIndex = 0;
             
-            if(kw == null || kw.isEmpty()){
-                sql = "SELECT * FROM orders";
-                stm = conn.prepareStatement(sql);
+            if (s != null && s != OrderStatus.ALL) {
+                stm.setString(++paramIndex, s.toString());
             }
-            else
-            {
-                sql = "SELECT * FROM orders WHERE OrderID LIKE CONCAT('%', ?, '%') OR CustomerID LIKE CONCAT('%', ?, '%')";
-                stm = conn.prepareStatement(sql);
-                stm.setString(1, kw);
-                stm.setString(2, kw);
+            
+            if (kw != null && !kw.isEmpty()) {
+                stm.setString(++paramIndex, kw);
+                stm.setString(++paramIndex, kw);
             }
+            
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Order o = new Order(rs.getInt("orderId")
                         ,rs.getInt("customerID")
                         ,rs.getDate("orderDate")
                         ,rs.getString("shipAddress")
-                        ,OrderStatus.converToEnum(rs.getString("OrderStatus")));
+                        ,OrderStatus.converToEnum(rs.getString("OrderStatus"))
+                );
                 results.add(o);
             }
 
+        } catch (SQLException ex) {
+            Logger.getLogger(OrderServices.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            return results;
+    }
+    public List<OrderDetail> getOrderDetail(){
+        List<OrderDetail> results = new ArrayList<>();
+        try(Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT * FROM orderdetails";
+            PreparedStatement stm;
+            
         } catch (SQLException ex) {
             Logger.getLogger(OrderServices.class.getName()).log(Level.SEVERE, null, ex);
         }

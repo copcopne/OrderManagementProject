@@ -1,6 +1,7 @@
 package com.si.pojo;
 
 public enum OrderStatus {
+    ALL(""),
     DANG_XU_LY("Đang xử lý"),
     DANG_GIAO("Đang giao"),
     DA_GIAO("Đã giao");
