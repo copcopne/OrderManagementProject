@@ -45,7 +45,7 @@ public class UserServices {
         return user;
     }
 
-    public List<User> findUsersByName(String kw) {
+    public List<User> findUsers(String kw) {
         List<User> users = new ArrayList<>();
         String queryAll = "SELECT * FROM Users";
         String queryByFullName = "SELECT * FROM Users WHERE FullName LIKE ?";
@@ -156,43 +156,57 @@ public class UserServices {
         return false;
     }
 
-    public boolean updateUser(String currentUsername, String newUsername, String fullName, String password) {
-        String query = "UPDATE Users SET FullName = ?, Password = ?, Username = ? WHERE Username = ?";
+    public boolean updateUser(String currentUsername, String newUsername, String fullName, String password, Boolean isAdmin)
+            throws IllegalArgumentException, SQLException {
 
         User user = this.findUserByUsername(currentUsername);
         if (user == null) {
-            return false;
+            throw new IllegalArgumentException("Không tìm thấy người dùng với username: " + currentUsername);
         }
 
         if (!currentUsername.equals(newUsername)) {
             User u = findUserByUsername(newUsername);
             if (u != null) {
-                throw new IllegalArgumentException("Username already taken: " + newUsername);
+                throw new IllegalArgumentException("Username đã tồn tại: " + newUsername);
             }
         }
 
+        String query = "UPDATE Users SET FullName = ?, Username = ?";
+        boolean hasPassword = password != null && !password.isBlank();
+        boolean hasIsAdmin = isAdmin != null;
+
+        if (hasPassword) {
+            query += ", Password = ?";
+        }
+        if (hasIsAdmin) {
+            query += ", IsAdmin = ?";
+        }
+        query += " WHERE Username = ?";
+
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
-            stm.setString(1, fullName);
-            stm.setString(2, PasswordHasher.hashPassword(newUsername, password));
-            stm.setString(3, newUsername);
-            stm.setString(4, currentUsername);
+            int index = 1;
+            stm.setString(index++, fullName);
+            stm.setString(index++, newUsername);
+            if (hasPassword) {
+                stm.setString(index++, PasswordHasher.hashPassword(newUsername, password));
+            }
+            if (hasIsAdmin) {
+                stm.setBoolean(index++, isAdmin);
+            }
+            stm.setString(index++, currentUsername);
 
             int rowsAffected = stm.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("Failed to update user: " + currentUsername);
+                throw new SQLException("Cập nhật thất bại cho user: " + currentUsername);
             }
+
             return true;
 
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Validation Error: " + ex.getMessage());
-        } catch (SQLException ex) {
-            System.out.println("Database Error: " + ex.getMessage());
         } catch (Exception ex) {
             System.out.println("Unexpected Error: " + ex.getMessage());
             ex.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
 }

@@ -41,7 +41,7 @@ public class UserSession {
     }
     
     public boolean isAdmin() {
-        return this.getCurrentUser().isAdmin();
+        return this.getCurrentUser().getIsAdmin();
     }
     
     public String getUsername() {

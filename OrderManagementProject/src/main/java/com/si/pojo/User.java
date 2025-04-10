@@ -4,24 +4,25 @@
  */
 package com.si.pojo;
 
-
 /**
  *
  * @author copcopne
  */
 public class User {
+
     private int id;
     private String fullName;
     private String username;
     private String password;
     private boolean isAdmin;
-    
+
     public User(int id, String fullName, String username, boolean isAdmin) {
         this.id = id;
         this.fullName = fullName;
         this.username = username;
         this.isAdmin = isAdmin;
     }
+
     /**
      * @return the id
      */
@@ -81,7 +82,7 @@ public class User {
     /**
      * @return the isAdmin
      */
-    public boolean isAdmin() {
+    public boolean getIsAdmin() {
         return isAdmin;
     }
 

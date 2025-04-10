@@ -24,11 +24,11 @@ public class AuthServices {
     
     public static void isPasswordValid(String password) throws IllegalArgumentException {
         if (password.length() < 8) {
-            throw new IllegalArgumentException("Password must be at least 8 characters long.");
+            throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
         }
 
         if (!password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$")) {
-            throw new IllegalArgumentException("Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+            throw new IllegalArgumentException("Mật khẩu phải có ít nhất 1 ký tự hoa, 1 ký tự thường, 1 chữ số và 1 ký tự đặc biệt.");
         }
     }
 }
