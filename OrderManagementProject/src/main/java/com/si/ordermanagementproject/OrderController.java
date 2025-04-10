@@ -8,13 +8,18 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 public class OrderController implements Initializable{
     @FXML private TableView<Order> tbOrder;
@@ -46,18 +51,70 @@ public class OrderController implements Initializable{
         
     }
     public void loadColumns(){
-        TableColumn colOrderId = new TableColumn("ID order");
-        TableColumn colCustomerId = new TableColumn("ID khách hàng");
-        TableColumn colOrderDate = new TableColumn("Ngày đặt");
-        TableColumn colShipAddress = new TableColumn("Địa chỉ giao");
-        TableColumn colOrderStatus = new TableColumn("Trạng thái đơn");
-        
-        colOrderId.setCellValueFactory(new PropertyValueFactory("orderId"));
-        colCustomerId.setCellValueFactory(new PropertyValueFactory("customerId"));
-        colOrderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
-        colShipAddress.setCellValueFactory(new PropertyValueFactory("shipAddress"));
-        colOrderStatus.setCellValueFactory(new PropertyValueFactory("orderStatus"));
-        tbOrder.getColumns().addAll(colOrderId, colCustomerId, colOrderDate, colShipAddress, colOrderStatus);
-    }
+    TableColumn colOrderId = new TableColumn<>("ID order");
+    TableColumn colCustomerId = new TableColumn<>("ID khách hàng");
+    TableColumn colOrderDate = new TableColumn<>("Ngày đặt");
+    TableColumn colShipAddress = new TableColumn<>("Địa chỉ giao");
+    TableColumn colOrderStatus = new TableColumn<>("Trạng thái đơn");
+
+    colOrderId.setCellValueFactory(new PropertyValueFactory<>("orderId"));
+    colCustomerId.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+    colOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
+    colShipAddress.setCellValueFactory(new PropertyValueFactory<>("shipAddress"));
+    colOrderStatus.setCellValueFactory(new PropertyValueFactory<>("orderStatus"));
+
+    TableColumn<Order, Void> colViewDetail = new TableColumn<>("");
     
+// Thêm cột chứa nút
+    colViewDetail.setCellFactory(param -> new TableCell<>() {
+        private final Button btn = new Button("Xem chi tiết");
+
+        {
+            btn.setOnAction(event -> {
+                Order order = getTableView().getItems().get(getIndex());
+                showOrderDetails(order.getOrderId());
+            });
+        }
+
+        @Override
+        protected void updateItem(Void item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setGraphic(null);
+            } else {
+                setGraphic(btn);
+            }
+        }
+    });
+
+    tbOrder.getColumns().addAll(colOrderId, colCustomerId, colOrderDate, colShipAddress, colOrderStatus, colViewDetail);
 }
+    public void showOrderDetails(int orderID) {
+    Stage stage = new Stage();
+    stage.setTitle("Chi tiết đơn hàng #" + orderID);
+    
+    TableView<OrderDetail> tableView = new TableView<>();
+    TableColumn skuCol = new TableColumn<>("SKU");
+    TableColumn unitPriceCol = new TableColumn<>("Đơn giá");
+    TableColumn quantityCol = new TableColumn<>("Số lượng");
+    TableColumn discountCol = new TableColumn<>("Giảm giá");
+    skuCol.setCellValueFactory(new PropertyValueFactory<>("SKU"));
+    
+    tableView.getColumns().addAll(skuCol, unitPriceCol, quantityCol, discountCol);
+    unitPriceCol.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+    quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+    discountCol.setCellValueFactory(new PropertyValueFactory<>("discount"));
+
+    // Lấy dử liệu của Order Detail
+    OrderServices os = new OrderServices();
+    List<OrderDetail> orderDetails = os.getOrderDetail(orderID);
+    ObservableList<OrderDetail> data = FXCollections.observableArrayList(orderDetails);
+    tableView.setItems(data);
+
+    // Tạo Scene và hiển thị
+    Scene scene = new Scene(tableView, 600, 400);
+    stage.setScene(scene);
+    stage.show();
+    }
+}
+    

@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,12 +57,21 @@ public class OrderServices {
         }
             return results;
     }
-    public List<OrderDetail> getOrderDetail(){
+    public List<OrderDetail> getOrderDetail(int orderID){
         List<OrderDetail> results = new ArrayList<>();
         try(Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT * FROM orderdetails";
-            PreparedStatement stm;
-            
+            String sql = "SELECT * FROM orderdetails WHERE OrderID = " + orderID;
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                OrderDetail od = new OrderDetail(rs.getInt("orderID")
+                        ,rs.getString("SKU")
+                        ,rs.getDouble("unitPrice")
+                        ,rs.getInt("quantity")
+                        ,rs.getDouble("discount")
+                );
+                results.add(od);
+            }
         } catch (SQLException ex) {
             Logger.getLogger(OrderServices.class.getName()).log(Level.SEVERE, null, ex);
         }
