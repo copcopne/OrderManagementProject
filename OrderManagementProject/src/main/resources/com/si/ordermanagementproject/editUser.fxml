@@ -48,7 +48,7 @@
             <Insets bottom="10.0" left="10.0" right="20.0" top="10.0" />
          </GridPane.margin>
       </TextField>
-      <Label alignment="CENTER" text="Là người quản trị" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+      <Label fx:id="isAdminLb" alignment="CENTER" text="Là người quản trị" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin>
@@ -58,8 +58,13 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin>
       </CheckBox>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4">
          <children>
+            <Button fx:id="editPassword" mnemonicParsing="false" onAction="#editPasswordHandler" text="Đổi mật khẩu">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </HBox.margin>
+            </Button>
             <Button fx:id="restPassword" mnemonicParsing="false" onAction="#reset" text="Đặt lại mật khẩu">
                <HBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

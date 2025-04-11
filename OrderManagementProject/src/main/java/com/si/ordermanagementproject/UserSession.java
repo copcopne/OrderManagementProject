@@ -14,6 +14,7 @@ public class UserSession {
     private static UserSession instance;
     private User currentUser;
     private boolean loggedIn;
+    private boolean isAdmin;
     
     private UserSession() {
         this.loggedIn = false;
@@ -29,6 +30,7 @@ public class UserSession {
     public void login(User user) {
         this.currentUser = user;
         this.loggedIn = true;
+        this.isAdmin = user.getIsAdmin();
     }
     
     public void logout() {
@@ -40,12 +42,8 @@ public class UserSession {
         return this.loggedIn;
     }
     
-    public boolean isAdmin() {
-        return this.getCurrentUser().getIsAdmin();
-    }
-    
     public String getUsername() {
-        return this.getCurrentUser().getFullName();
+        return this.getCurrentUser().getUsername();
     }
 
     /**
@@ -53,5 +51,12 @@ public class UserSession {
      */
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    /**
+     * @return the isAdmin
+     */
+    public boolean getIsAdmin() {
+        return isAdmin;
     }
 }

@@ -164,35 +164,51 @@ public class UserServices {
             throw new IllegalArgumentException("Không tìm thấy người dùng với username: " + currentUsername);
         }
 
-        if (!currentUsername.equals(newUsername)) {
+        if (newUsername != null && !currentUsername.equals(newUsername)) {
             User u = findUserByUsername(newUsername);
             if (u != null) {
                 throw new IllegalArgumentException("Username đã tồn tại: " + newUsername);
             }
         }
 
-        String query = "UPDATE Users SET FullName = ?, Username = ?";
+        boolean hasUsername = newUsername != null && !newUsername.isBlank();
+        boolean hasFullName = fullName != null && !fullName.isBlank();
         boolean hasPassword = password != null && !password.isBlank();
         boolean hasIsAdmin = isAdmin != null;
 
+        List<String> updates = new ArrayList<>();
+
+        if (hasFullName) {
+            updates.add("FullName = ?");
+        }
+        if (hasUsername) {
+            updates.add("Username = ?");
+        }
         if (hasPassword) {
-            query += ", Password = ?";
+            updates.add("Password = ?");
         }
         if (hasIsAdmin) {
-            query += ", IsAdmin = ?";
+            updates.add("IsAdmin = ?");
         }
-        query += " WHERE Username = ?";
+
+        String query = "UPDATE Users SET " + String.join(", ", updates) + " WHERE Username = ?";
 
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             int index = 1;
-            stm.setString(index++, fullName);
-            stm.setString(index++, newUsername);
+            if (hasFullName) {
+                stm.setString(index++, fullName);
+            }
+            if (hasUsername) {
+                stm.setString(index++, newUsername);
+            }
             if (hasPassword) {
-                stm.setString(index++, PasswordHasher.hashPassword(newUsername, password));
+                stm.setString(index++, PasswordHasher.hashPassword(
+                        hasUsername ? newUsername : currentUsername, password));
             }
             if (hasIsAdmin) {
                 stm.setBoolean(index++, isAdmin);
             }
+
             stm.setString(index++, currentUsername);
 
             int rowsAffected = stm.executeUpdate();
