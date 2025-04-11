@@ -77,4 +77,18 @@ public class OrderServices {
         }
             return results;
     }
+    
+    public void updateOrderStatus(int orderId, OrderStatus newStatus){
+        try (Connection conn = JdbcUtils.getConn()) {
+            conn.setAutoCommit(false);
+            String sql = "UPDATE orders SET OrderStatus = ? WHERE OrderID = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, newStatus.toString());
+            stmt.setInt(2, orderId);
+            stmt.executeUpdate();
+            conn.commit();
+        } catch (SQLException ex) {
+            Logger.getLogger(OrderServices.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

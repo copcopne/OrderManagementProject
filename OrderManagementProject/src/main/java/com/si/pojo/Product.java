@@ -11,14 +11,14 @@ package com.si.pojo;
 public class Product {
     private String SKU;
     private String productName;
-    private int stockQuanity;
+    private int stockQuantity;
     private float unitPrice;
     private int minStockLevel;
 
     public Product(String SKU, String ProductName, int StockQuanity, float UnitPrice, int MinStockLevel) {
         this.SKU = SKU;
         this.productName = ProductName;
-        this.stockQuanity = StockQuanity;
+        this.stockQuantity = StockQuanity;
         this.unitPrice = UnitPrice;
         this.minStockLevel = MinStockLevel;
     }
@@ -41,7 +41,7 @@ public class Product {
      * @return the StockQuanity
      */
     public int getStockQuanity() {
-        return stockQuanity;
+        return stockQuantity;
     }
 
     /**

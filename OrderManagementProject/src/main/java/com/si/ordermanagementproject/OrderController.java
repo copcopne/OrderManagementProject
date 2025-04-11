@@ -4,6 +4,7 @@ import com.si.pojo.Order;
 import com.si.pojo.OrderDetail;
 import com.si.pojo.OrderStatus;
 import com.si.services.OrderServices;
+import com.si.services.ProductServices;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -62,15 +63,14 @@ public class OrderController implements Initializable{
     colOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
     colShipAddress.setCellValueFactory(new PropertyValueFactory<>("shipAddress"));
     colOrderStatus.setCellValueFactory(new PropertyValueFactory<>("orderStatus"));
-
-    TableColumn<Order, Void> colViewDetail = new TableColumn<>("");
     
-// Thêm cột chứa nút
+    // Thêm cột chứa nút xem chi tiết 
+    TableColumn<Order, Void> colViewDetail = new TableColumn<>("");
     colViewDetail.setCellFactory(param -> new TableCell<>() {
-        private final Button btn = new Button("Xem chi tiết");
+        private final Button btnDetail = new Button("Xem chi tiết");
 
         {
-            btn.setOnAction(event -> {
+            btnDetail.setOnAction(event -> {
                 Order order = getTableView().getItems().get(getIndex());
                 showOrderDetails(order.getOrderId());
             });
@@ -79,15 +79,42 @@ public class OrderController implements Initializable{
         @Override
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);
-            if (empty) {
-                setGraphic(null);
-            } else {
-                setGraphic(btn);
-            }
+            setGraphic(empty ? null : btnDetail);
         }
     });
+    
+    //thêm cột chứa nút xác nhận
+    TableColumn<Order, Void> colConfirm = new TableColumn<>("");
+    colConfirm.setCellFactory(param -> new TableCell<>() {
+        private final Button btnConfirm = new Button("Xác nhận");
+        OrderServices o = new OrderServices();
+        {
+            btnConfirm.setOnAction(event -> {
+                Order order = getTableView().getItems().get(getIndex());
+                if(order.getOrderStatus()==OrderStatus.DANG_XU_LY){
+                    ProductServices p = new ProductServices();
+                    int orderID = order.getOrderId();
+                    if(p.isStockAvailable(orderID)){
+                        p.deductStock(orderID);
+                        o.updateOrderStatus(orderID, OrderStatus.DANG_GIAO);
+                        loadData(txtSearch.getText(), cbStatus.getValue());
+                    }
+                }
+            });
+            
+        }
+        @Override
+        protected void updateItem(Void item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || getTableView().getItems().get(getIndex()).getOrderStatus() != OrderStatus.DANG_XU_LY) {
+                setGraphic(null);  // Ẩn nút nếu trạng thái không phải "Đang xử lý"
+            } else {
+                setGraphic(btnConfirm);
+            }
+    }
+});
 
-    tbOrder.getColumns().addAll(colOrderId, colCustomerId, colOrderDate, colShipAddress, colOrderStatus, colViewDetail);
+    tbOrder.getColumns().addAll(colOrderId, colCustomerId, colOrderDate, colShipAddress, colOrderStatus, colViewDetail, colConfirm);
 }
     public void showOrderDetails(int orderID) {
     Stage stage = new Stage();
