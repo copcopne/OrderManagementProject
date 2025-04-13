@@ -40,7 +40,7 @@ public class Product {
     /**
      * @return the StockQuanity
      */
-    public int getStockQuanity() {
+    public int getStockQuantity() {
         return stockQuantity;
     }
 
@@ -57,6 +57,12 @@ public class Product {
     public int getMinStockLevel() {
         return minStockLevel;
     }
+
+    @Override
+    public String toString() {
+        return this.SKU+ " - " + this.productName;
+    }
+    
     
     
 }

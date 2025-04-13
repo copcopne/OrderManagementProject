@@ -18,10 +18,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("login"));
+        scene = new Scene(loadFXML("stockIn"));
         stage.setTitle("Quản lý");
-        stage.setResizable(false);
-        stage.initStyle(StageStyle.UTILITY);
         stage.setScene(scene);
         stage.show();
     }
