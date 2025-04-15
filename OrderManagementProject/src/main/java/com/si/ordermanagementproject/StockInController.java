@@ -8,14 +8,22 @@ import com.si.pojo.Product;
 import com.si.services.ProductServices;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -42,7 +50,7 @@ public class StockInController implements Initializable {
     @FXML
     private TableView<Product> table;
     @FXML
-    private Button addNewBtn;
+    private Button addNewProductBtn;
     @FXML
     private Button addBtn;
     @FXML
@@ -50,41 +58,40 @@ public class StockInController implements Initializable {
     @FXML
     private Button cancel;
     @FXML
-    private Button saveBtn;
+    private Button saveNewProductBtn;
+    @FXML
+    private Button cancelAddNewProductBtn;
 
     boolean isCreating = false;
+    boolean isEditing = false;
     List<Product> currentProducts = new ArrayList<>();
     List<Product> updatedProducts = new ArrayList<>();
+    Map<Product, Integer> importAmounts = new HashMap<>();
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        nameTxt.setDisable(true);
-        priceTxt.setDisable(true);
-        stockTxt.setDisable(true);
-        minStockTxt.setDisable(true);
-        amountTxt.setDisable(true);
-        saveBtn.setDisable(true);
-        saveBtn.setVisible(false);
+        toggleInputs();
         loadColumns();
+        addBtn.setDisable(true);
 
         ProductServices p = new ProductServices();
         currentProducts = p.getProducts(null);
-        SKUcb.getItems().addAll(currentProducts);
         loadComboBoxData();
 
     }
 
     public void loadComboBoxData() {
+        SKUcb.getItems().clear();
         SKUcb.getItems().addAll(currentProducts);
     }
 
     public void loadColumns() {
         TableColumn colId = new TableColumn("SKU");
         colId.setCellValueFactory(new PropertyValueFactory("SKU"));
-        colId.setPrefWidth(200);
+        colId.setPrefWidth(100);
 
         TableColumn colName = new TableColumn("Tên SP");
         colName.setCellValueFactory(new PropertyValueFactory("productName"));
@@ -92,44 +99,270 @@ public class StockInController implements Initializable {
 
         TableColumn colPrice = new TableColumn("Đơn giá");
         colPrice.setCellValueFactory(new PropertyValueFactory("unitPrice"));
-        colPrice.setPrefWidth(100);
+        colPrice.setPrefWidth(75);
 
-        TableColumn colQuantity = new TableColumn("Số lượng nhập");
+        TableColumn colQuantity = new TableColumn("Tồn kho");
         colQuantity.setCellValueFactory(new PropertyValueFactory("stockQuantity"));
-        colQuantity.setPrefWidth(150);
+        colQuantity.setPrefWidth(75);
 
-        TableColumn colMinStock = new TableColumn("Tồn kho tối thiểu");
-        colMinStock.setCellValueFactory(new PropertyValueFactory("MinStockLevel"));
-        colMinStock.setPrefWidth(150);
+        TableColumn<Product, String> colMinStock = new TableColumn<>("Số lượng nhập");
+        colMinStock.setCellValueFactory(product -> {
+            Integer amount = importAmounts.get(product.getValue());
+            return new SimpleStringProperty(amount != null ? amount.toString() : "0");
+        });
+        colMinStock.setPrefWidth(100);
 
-        this.table.getColumns().addAll(colId, colName, colPrice, colQuantity, colMinStock);
+        TableColumn<Product, Void> colAction1 = new TableColumn<>();
+        colAction1.setCellFactory(col -> new TableCell<Product, Void>() {
+            Button editBtn = new Button("Chỉnh sửa");
+
+            {
+                editBtn.setOnAction(evt -> {
+                    TableRow currentRow = getTableRow();
+                    Product selectedProduct = (Product) currentRow.getItem();
+                    for (Product p : SKUcb.getItems()) {
+                        if (p.getSKU().equals(selectedProduct.getSKU())) {
+                            SKUcb.getSelectionModel().select(p);
+                            break;
+                        }
+                    }
+                    Integer amount = importAmounts.get(selectedProduct);
+                    setInputs(selectedProduct, amount);
+                    editProduct();
+
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(editBtn);
+                }
+            }
+        });
+
+        TableColumn<Product, Void> colAction2 = new TableColumn<>();
+        colAction2.setCellFactory(col -> new TableCell<Product, Void>() {
+            Button delBtn = new Button("Xóa");
+
+            {
+                delBtn.setOnAction(evt -> {
+                    Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn xóa không?");
+                    Optional<ButtonType> result = confirm.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        TableRow currentRow = getTableRow();
+                        Product selectedProduct = (Product) currentRow.getItem();
+                        Product matched = updatedProducts.stream().filter(p -> p.getSKU().equals(selectedProduct.getSKU())).findFirst().orElse(null);
+                        if (matched != null) {
+                            updatedProducts.remove(matched);
+                            Utils.getAlert("Xóa thành công.").show();
+                            loadTableData();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(delBtn);
+                }
+            }
+        });
+
+        this.table.getColumns().addAll(colId, colName, colPrice, colQuantity, colMinStock, colAction1, colAction2);
 
     }
 
     public void loadTableData() {
+        clearInputs();
+        this.table.getItems().clear();
         this.table.setItems(FXCollections.observableArrayList(updatedProducts));
     }
 
     public void process() {
-        // Xử lý nhập hàng vào database
+        if (updatedProducts.isEmpty()) {
+            Utils.getAlert("Bạn chưa thực hiện nhập hàng.").show();
+            return;
+        }
+        Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn nhập hàng không?");
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            ProductServices s = new ProductServices();
+            try {
+                for (Product product : updatedProducts) {
+                    if (s.getProduct(product.getSKU()) != null) {
+                        boolean rs = s.addStock(product, importAmounts.get(product));
+                        if (rs == false) {
+                            Utils.getAlert("Lỗi khi thực hiện nhập hàng với SKU: " + product.getSKU()).showAndWait();
+                        }
+                    } else {
+                        Product newP = new Product(product.getSKU(),
+                                product.getProductName(),
+                                importAmounts.get(product),
+                                product.getUnitPrice(),
+                                product.getMinStockLevel());
+                        boolean rs = s.addProduct(newP);
+                        if (rs == false) {
+                            Utils.getAlert("Lỗi khi thực hiện nhập hàng với SKU: " + product.getSKU()).showAndWait();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Utils.getAlert("Lỗi xảy ra khi nhập hàng: " + e.getMessage()).show();
+                return;
+            }
+            Utils.getAlert("Nhập hàng thành công.").showAndWait();
+            this.ok.getScene().getWindow().hide();
+        }
     }
 
     public void cancel() {
         // Hủy thực hiện việc nhập hàng, nếu đang trong quá trình nhập thì hiện prompt thông báo
+        if (!updatedProducts.isEmpty()) {
+            Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn hủy việc nhập hàng không?");
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                cancel.getScene().getWindow().hide();
+            }
+            return;
+        }
+        cancel.getScene().getWindow().hide();
+    }
+
+    public void validateNewProduct() throws IllegalArgumentException {
+        String SKUid = SKUcb.getEditor().getText();
+        String name = nameTxt.getText();
+        String unitPrice = priceTxt.getText();
+        String minStock = minStockTxt.getText();
+
+        if (SKUid.isBlank() || SKUid.isEmpty()) {
+            SKUcb.requestFocus();
+            throw new IllegalArgumentException("Mã SKU không được để trống.");
+        }
+        if (name.isBlank() || name.isEmpty()) {
+            nameTxt.requestFocus();
+            throw new IllegalArgumentException("Tên không được để trống.");
+        }
+        if (unitPrice.isBlank() || unitPrice.isEmpty()) {
+            priceTxt.requestFocus();
+            throw new IllegalArgumentException("Đơn giá được để trống.");
+        }
+        if (minStock.isBlank() || minStock.isEmpty()) {
+            minStockTxt.requestFocus();
+            throw new IllegalArgumentException("Số lượng tồn kho tối thiểu không được để trống.");
+        }
+        float priceNum = 0;
+        try {
+            priceNum = Float.parseFloat(unitPrice);
+        } catch (NumberFormatException e) {
+            priceTxt.requestFocus();
+            throw new NumberFormatException("Giá sản phẩm phải là một số thực hợp lệ.");
+        }
+        if (priceNum <= 0.0) {
+            priceTxt.requestFocus();
+            throw new NumberFormatException("Giá sản phẩm không hợp lệ (>0)");
+        }
+        int minStockNum = 0;
+        try {
+            minStockNum = Integer.parseInt(minStock);
+        } catch (NumberFormatException e) {
+            minStockTxt.requestFocus();
+            throw new NumberFormatException("Số lượng tồn kho tối thiểu phải là một số nguyên hợp lệ.");
+        }
+
+        if (minStockNum > 100 || minStockNum <= 0) {
+            minStockTxt.requestFocus();
+            throw new IllegalArgumentException("Số lượng tồn kho tối thiểu không nằm trong khoảng cho phép (1 - 100).");
+        }
+
+    }
+
+    public void validateAmount() throws IllegalArgumentException {
+        String amount = amountTxt.getText();
+
+        if (amount.isBlank() || amount.isEmpty()) {
+            amountTxt.requestFocus();
+            throw new IllegalArgumentException("Số lượng nhập không được để trống.");
+        }
+        int amountNum = 0;
+        try {
+            amountNum = Integer.parseInt(amount);
+        } catch (NumberFormatException e) {
+            amountTxt.requestFocus();
+            throw new NumberFormatException("Số lượng nhập vào phải là một số nguyên hợp lệ.");
+        }
+        if (amountNum > 1000 || amountNum <= 0) {
+            amountTxt.requestFocus();
+            throw new IllegalArgumentException("Số lượng nhập vào phải nằm trong khoảng cho phép (1 - 1000)");
+        }
     }
 
     public void addHandler() {
         // Nhập thêm hàng từ products có sẵn
+        Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
+        try {
+            validateAmount();
+        } catch (IllegalArgumentException e) {
+            Utils.getAlert(e.getMessage()).show();
+            return;
+        }
+        updatedProducts.add(selectedProduct);
+        importAmounts.put(selectedProduct, Integer.valueOf(amountTxt.getText()));
+        addBtn.setDisable(true);
+        toggleInputs();
+        loadTableData();
+    }
+
+    public void saveEditedProductHandler() {
+        if (isEditing) {
+            Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
+            if (selectedProduct != null) {
+                try {
+                    validateAmount();
+                } catch (IllegalArgumentException e) {
+                    Utils.getAlert(e.getMessage()).show();
+                    return;
+                }
+                int newAmount = Integer.parseInt(amountTxt.getText());
+                importAmounts.put(selectedProduct, newAmount);
+                isEditing = false;
+                toggleInputs();
+                clearInputs();
+                loadTableData();
+            }
+        } else {
+            createHandler();
+        }
     }
 
     public void createHandler() {
-        Product product = new Product(SKUcb.getEditor().getText(),
+        try {
+            validateNewProduct();
+            validateAmount();
+        } catch (IllegalArgumentException e) {
+            Utils.getAlert(e.getMessage()).show();
+            return;
+        }
+        Product product;
+        product = new Product(SKUcb.getEditor().getText(),
                 nameTxt.getText(),
-                Integer.parseInt(amountTxt.getText()),
+                0,
                 Float.parseFloat(priceTxt.getText()),
                 Integer.parseInt(minStockTxt.getText()));
         updatedProducts.add(product);
+        importAmounts.put(product, Integer.valueOf(amountTxt.getText()));
         loadTableData();
+        boolean isInList = currentProducts.stream().anyMatch(p -> p.getSKU().equals(product.getSKU()));
+        if (!isInList) {
+            currentProducts.add(product);
+        }
 
         isCreating = false;
         toggleInputs();
@@ -148,18 +381,59 @@ public class StockInController implements Initializable {
 
     }
 
+    public void cancelAddHandler() {
+        isCreating = false;
+        isEditing = false;
+        toggleInputs();
+        clearInputs();
+        loadComboBoxData();
+    }
+
     public void toggleInputs() {
-        SKUcb.setEditable(isCreating);
-        nameTxt.setDisable(!isCreating);
-        priceTxt.setDisable(!isCreating);
-        minStockTxt.setDisable(!isCreating);
-        amountTxt.setDisable(!isCreating);
-        saveBtn.setDisable(!isCreating);
-        saveBtn.setVisible(isCreating);
+        if (isCreating) {
+            // Khi tạo mới sản phẩm
+            addBtn.setDisable(true);
+            addNewProductBtn.setDisable(true);
+            SKUcb.setEditable(true);
+            SKUcb.setDisable(false);
+            nameTxt.setDisable(false);
+            priceTxt.setDisable(false);
+            minStockTxt.setDisable(false);
+            amountTxt.setDisable(false);
+            saveNewProductBtn.setDisable(false);
+            saveNewProductBtn.setVisible(true);
+            cancelAddNewProductBtn.setVisible(true);
+        } else if (isEditing) {
+            // Khi chỉnh sửa sản phẩm
+            addBtn.setDisable(true);
+            addNewProductBtn.setDisable(true);
+            SKUcb.setDisable(true); // Không cho chọn SKU khi đang sửa
+            SKUcb.setEditable(false);
+            nameTxt.setDisable(true);
+            priceTxt.setDisable(true);
+            minStockTxt.setDisable(true);
+            amountTxt.setDisable(false); // Chỉ cho nhập lại số lượng
+            saveNewProductBtn.setDisable(false);
+            saveNewProductBtn.setVisible(true);
+            cancelAddNewProductBtn.setVisible(true);
+        } else {
+            // Trạng thái bình thường
+            addBtn.setDisable(true);
+            addNewProductBtn.setDisable(false);
+            SKUcb.setDisable(false);
+            SKUcb.setEditable(false);
+            nameTxt.setDisable(true);
+            priceTxt.setDisable(true);
+            minStockTxt.setDisable(true);
+            amountTxt.setDisable(true);
+            saveNewProductBtn.setDisable(true);
+            saveNewProductBtn.setVisible(false);
+            cancelAddNewProductBtn.setVisible(false);
+        }
+
     }
 
     public void clearInputs() {
-        amountTxt.setDisable(true);
         SKUcb.setValue(null);
         SKUcb.getEditor().clear();
         nameTxt.setText("");
@@ -167,10 +441,14 @@ public class StockInController implements Initializable {
         stockTxt.setText("");
         minStockTxt.setText("");
         amountTxt.setText("");
+        amountTxt.setDisable(!(isCreating || isEditing));
+
     }
 
     public void editProduct() {
-        // Lấy product ở hàng được ấn nút edit truyền vào setInputs() và request focus vào ô số lượng nhập
+        isEditing = true;
+        toggleInputs();
+        amountTxt.requestFocus();
     }
 
     public void setInputs(Product selectedProduct, Integer amount) {
@@ -178,8 +456,11 @@ public class StockInController implements Initializable {
         priceTxt.setText(String.valueOf(selectedProduct.getUnitPrice()));
         stockTxt.setText(String.valueOf(selectedProduct.getStockQuantity()));
         minStockTxt.setText(String.valueOf(selectedProduct.getMinStockLevel()));
-        if (amount != null)
+        if (amount != null) {
             amountTxt.setText(String.valueOf(amount));
+        } else {
+            amountTxt.setText("");
+        }
     }
 
     public void selectHandler() {
@@ -188,6 +469,7 @@ public class StockInController implements Initializable {
                 Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
                 if (selectedProduct != null) {
                     amountTxt.setDisable(false);
+                    addBtn.setDisable(false);
                     setInputs(selectedProduct, null);
                 }
             } catch (ClassCastException ex) {
