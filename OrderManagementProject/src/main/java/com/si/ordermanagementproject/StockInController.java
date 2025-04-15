@@ -242,19 +242,19 @@ public class StockInController implements Initializable {
         String unitPrice = priceTxt.getText();
         String minStock = minStockTxt.getText();
 
-        if (SKUid.isBlank() || SKUid.isEmpty()) {
+        if (SKUid.isEmpty()) {
             SKUcb.requestFocus();
             throw new IllegalArgumentException("Mã SKU không được để trống.");
         }
-        if (name.isBlank() || name.isEmpty()) {
+        if (name.isEmpty()) {
             nameTxt.requestFocus();
             throw new IllegalArgumentException("Tên không được để trống.");
         }
-        if (unitPrice.isBlank() || unitPrice.isEmpty()) {
+        if (unitPrice.isEmpty()) {
             priceTxt.requestFocus();
             throw new IllegalArgumentException("Đơn giá được để trống.");
         }
-        if (minStock.isBlank() || minStock.isEmpty()) {
+        if (minStock.isEmpty()) {
             minStockTxt.requestFocus();
             throw new IllegalArgumentException("Số lượng tồn kho tối thiểu không được để trống.");
         }
@@ -285,22 +285,23 @@ public class StockInController implements Initializable {
     }
 
     public void validateAmount() throws IllegalArgumentException {
-        String amount = amountTxt.getText();
-
-        if (amount.isBlank() || amount.isEmpty()) {
+        String raw = amountTxt.getText();
+        if (raw.isBlank()) {
             amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng nhập không được để trống.");
+            throw new IllegalArgumentException("Số lượng hàng cần nhập không được để trống.");
         }
-        int amountNum = 0;
+
+        int inputNum;
         try {
-            amountNum = Integer.parseInt(amount);
+            inputNum = Integer.parseInt(raw);
         } catch (NumberFormatException e) {
             amountTxt.requestFocus();
-            throw new NumberFormatException("Số lượng nhập vào phải là một số nguyên hợp lệ.");
+            throw new NumberFormatException("Số lượng nhập phải là số nguyên hợp lệ.");
         }
-        if (amountNum > 1000 || amountNum <= 0) {
+
+        if (inputNum <= 0) {
             amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng nhập vào phải nằm trong khoảng cho phép (1 - 1000)");
+            throw new IllegalArgumentException("Số lượng nhập phải lớn hơn 0.");
         }
     }
 
@@ -313,8 +314,14 @@ public class StockInController implements Initializable {
             Utils.getAlert(e.getMessage()).show();
             return;
         }
+        Product product = updatedProducts.stream().filter(p -> p.getSKU().equals(selectedProduct.getSKU())).findFirst().orElse(null);
+        if(product == null) {
         updatedProducts.add(selectedProduct);
         importAmounts.put(selectedProduct, Integer.valueOf(amountTxt.getText()));
+        } else {
+            int currentAmount =importAmounts.get(selectedProduct);
+            importAmounts.put(selectedProduct, Integer.parseInt(amountTxt.getText()) + currentAmount);
+        }
         addBtn.setDisable(true);
         toggleInputs();
         loadTableData();
@@ -359,11 +366,7 @@ public class StockInController implements Initializable {
         updatedProducts.add(product);
         importAmounts.put(product, Integer.valueOf(amountTxt.getText()));
         loadTableData();
-        boolean isInList = currentProducts.stream().anyMatch(p -> p.getSKU().equals(product.getSKU()));
-        if (!isInList) {
-            currentProducts.add(product);
-        }
-
+        
         isCreating = false;
         toggleInputs();
         clearInputs();

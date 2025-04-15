@@ -89,8 +89,26 @@ public class ProductServices {
         }
     }
 
-    public void deductStock(Product p, int num) {
-
+    public boolean deductStock(Product p, int num) {
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "UPDATE Products "
+                    + "SET StockQuantity = StockQuantity - ? "
+                    + "WHERE SKU = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, num);
+            stmt.setString(2, p.getSKU());
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Failed to update product with this SKU: " + p.getSKU());
+            }
+            return true;
+        } catch (SQLException ex) {
+            System.out.println("Database Error: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("Unexpected Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     public Product getProduct(String SKU) {
@@ -130,7 +148,7 @@ public class ProductServices {
             stmt.setString(2, p.getSKU());
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("Failed to create product with this SKU: " + p.getSKU());
+                throw new SQLException("Failed to add product with this SKU: " + p.getSKU());
             }
             return true;
         } catch (SQLException ex) {
