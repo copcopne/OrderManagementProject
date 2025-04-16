@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -87,6 +88,16 @@ public class ProductServices {
         } catch (SQLException ex) {
             Logger.getLogger(ProductServices.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public List<Product> getProducts(String kw, List<Product> source) {
+        if (kw == null || kw.trim().isEmpty()) {
+            return new ArrayList<>(source);
+        }
+        String lowerKw = kw.toLowerCase();
+        return source.stream()
+                .filter(p -> p.getSKU().toLowerCase().contains(lowerKw))
+                .collect(Collectors.toList());
     }
 
     public boolean deductStock(Product p, int num) {

@@ -6,6 +6,7 @@ package com.si.ordermanagementproject;
 
 import com.si.pojo.Product;
 import com.si.services.ProductServices;
+import com.si.services.ValidationServices;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,25 +65,54 @@ public class StockOutController implements Initializable {
     List<Product> currentProducts = new ArrayList<>();
     List<Product> updatedProducts = new ArrayList<>();
     Map<Product, Integer> importAmounts = new HashMap<>();
+    ProductServices s = null;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        s = new ProductServices();
         toggleInputs();
         loadColumns();
         addBtn.setDisable(true);
+        SKUcb.setEditable(true);
 
-        ProductServices p = new ProductServices();
-        currentProducts = p.getProducts(null);
-        loadComboBoxData();
+        currentProducts = s.getProducts(null);
+        loadComboBoxData(currentProducts);
+        SKUcb.getEditor().textProperty().addListener((obs, oldText, newText) -> {
+            if (newText.isEmpty() || newText.isBlank()) {
+                clearInputs();
+                toggleInputs();
+            }
+            List<Product> filtered = s.getProducts(newText, currentProducts);
+            loadComboBoxData(filtered);
+
+            SKUcb.getEditor().setText(newText);
+        });
+
+        SKUcb.setConverter(new javafx.util.StringConverter<Product>() {
+            @Override
+            public String toString(Product product) {
+                return product == null ? "" : product.getSKU();
+            }
+
+            @Override
+            public Product fromString(String string) {
+                for (Product p : SKUcb.getItems()) {
+                    if (p.getSKU().equals(string)) {
+                        return p;
+                    }
+                }
+                return null;
+            }
+        });
 
     }
 
-    public void loadComboBoxData() {
+    public void loadComboBoxData(List<Product> products) {
         SKUcb.getItems().clear();
-        SKUcb.getItems().addAll(currentProducts);
+        SKUcb.getItems().addAll(products);
     }
 
     public void loadColumns() {
@@ -191,7 +221,6 @@ public class StockOutController implements Initializable {
         Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn xuất hàng không?");
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            ProductServices s = new ProductServices();
             try {
                 for (Product product : updatedProducts) {
                     if (s.getProduct(product.getSKU()) != null) {
@@ -255,8 +284,11 @@ public class StockOutController implements Initializable {
     public void deductHandler() {
         // Xuất hàng
         Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
+        ValidationServices v = new ValidationServices();
+        int stock = selectedProduct.getStockQuantity();
         try {
-            validateAmount(null);
+            String currentAmount = amountTxt.getText();
+            v.validateExportQuantity(currentAmount, stock);
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
             return;
@@ -269,7 +301,7 @@ public class StockOutController implements Initializable {
             try {
                 int currentAmount = importAmounts.get(selectedProduct);
                 int newAmount = currentAmount + Integer.parseInt(amountTxt.getText());
-                validateAmount(newAmount);
+                v.validateExportQuantity(newAmount, stock);
                 importAmounts.put(selectedProduct, newAmount);
             } catch (IllegalArgumentException e) {
                 Utils.getAlert("Lỗi: " + e.getMessage()).show();
@@ -305,7 +337,7 @@ public class StockOutController implements Initializable {
         isEditing = false;
         toggleInputs();
         clearInputs();
-        loadComboBoxData();
+        loadComboBoxData(currentProducts);
     }
 
     public void toggleInputs() {
@@ -325,7 +357,7 @@ public class StockOutController implements Initializable {
             // Trạng thái bình thường
             addBtn.setDisable(true);
             SKUcb.setDisable(false);
-            SKUcb.setEditable(false);
+            SKUcb.setEditable(true);
             nameTxt.setDisable(true);
             priceTxt.setDisable(true);
             minStockTxt.setDisable(true);

@@ -6,6 +6,7 @@ package com.si.ordermanagementproject;
 
 import com.si.pojo.Product;
 import com.si.services.ProductServices;
+import com.si.services.ValidationServices;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,30 +63,61 @@ public class StockInController implements Initializable {
     @FXML
     private Button cancelAddNewProductBtn;
 
+    private javafx.beans.value.ChangeListener<String> comboBoxListener;
     boolean isCreating = false;
     boolean isEditing = false;
     List<Product> currentProducts = new ArrayList<>();
     List<Product> updatedProducts = new ArrayList<>();
     Map<Product, Integer> importAmounts = new HashMap<>();
+    ProductServices s = null;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        s = new ProductServices();
         toggleInputs();
         loadColumns();
         addBtn.setDisable(true);
 
-        ProductServices p = new ProductServices();
-        currentProducts = p.getProducts(null);
-        loadComboBoxData();
+        currentProducts = s.getProducts(null);
+        SKUcb.setEditable(true);
+        loadComboBoxData(currentProducts);
+        comboBoxListener = (obs, oldText, newText) -> {
+            if (newText.isEmpty() || newText.isBlank()) {
+                clearInputs();
+                toggleInputs();
+            }
+            List<Product> filtered = s.getProducts(newText, currentProducts);
+            loadComboBoxData(filtered);
+            SKUcb.getEditor().setText(newText);
+        };
+
+        SKUcb.getEditor().textProperty().addListener(comboBoxListener);
+
+        SKUcb.setConverter(new javafx.util.StringConverter<Product>() {
+            @Override
+            public String toString(Product product) {
+                return product == null ? "" : product.getSKU();
+            }
+
+            @Override
+            public Product fromString(String string) {
+                for (Product p : SKUcb.getItems()) {
+                    if (p.getSKU().equals(string)) {
+                        return p;
+                    }
+                }
+                return null;
+            }
+        });
 
     }
 
-    public void loadComboBoxData() {
+    public void loadComboBoxData(List<Product> products) {
         SKUcb.getItems().clear();
-        SKUcb.getItems().addAll(currentProducts);
+        SKUcb.getItems().addAll(products);
     }
 
     public void loadColumns() {
@@ -194,7 +226,6 @@ public class StockInController implements Initializable {
         Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn nhập hàng không?");
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            ProductServices s = new ProductServices();
             try {
                 for (Product product : updatedProducts) {
                     if (s.getProduct(product.getSKU()) != null) {
@@ -236,90 +267,24 @@ public class StockInController implements Initializable {
         cancel.getScene().getWindow().hide();
     }
 
-    public void validateNewProduct() throws IllegalArgumentException {
-        String SKUid = SKUcb.getEditor().getText();
-        String name = nameTxt.getText();
-        String unitPrice = priceTxt.getText();
-        String minStock = minStockTxt.getText();
-
-        if (SKUid.isEmpty()) {
-            SKUcb.requestFocus();
-            throw new IllegalArgumentException("Mã SKU không được để trống.");
-        }
-        if (name.isEmpty()) {
-            nameTxt.requestFocus();
-            throw new IllegalArgumentException("Tên không được để trống.");
-        }
-        if (unitPrice.isEmpty()) {
-            priceTxt.requestFocus();
-            throw new IllegalArgumentException("Đơn giá được để trống.");
-        }
-        if (minStock.isEmpty()) {
-            minStockTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng tồn kho tối thiểu không được để trống.");
-        }
-        float priceNum = 0;
-        try {
-            priceNum = Float.parseFloat(unitPrice);
-        } catch (NumberFormatException e) {
-            priceTxt.requestFocus();
-            throw new NumberFormatException("Giá sản phẩm phải là một số thực hợp lệ.");
-        }
-        if (priceNum <= 0.0) {
-            priceTxt.requestFocus();
-            throw new NumberFormatException("Giá sản phẩm không hợp lệ (>0)");
-        }
-        int minStockNum = 0;
-        try {
-            minStockNum = Integer.parseInt(minStock);
-        } catch (NumberFormatException e) {
-            minStockTxt.requestFocus();
-            throw new NumberFormatException("Số lượng tồn kho tối thiểu phải là một số nguyên hợp lệ.");
-        }
-
-        if (minStockNum > 100 || minStockNum <= 0) {
-            minStockTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng tồn kho tối thiểu không nằm trong khoảng cho phép (1 - 100).");
-        }
-
-    }
-
-    public void validateAmount() throws IllegalArgumentException {
-        String raw = amountTxt.getText();
-        if (raw.isBlank()) {
-            amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng hàng cần nhập không được để trống.");
-        }
-
-        int inputNum;
-        try {
-            inputNum = Integer.parseInt(raw);
-        } catch (NumberFormatException e) {
-            amountTxt.requestFocus();
-            throw new NumberFormatException("Số lượng nhập phải là số nguyên hợp lệ.");
-        }
-
-        if (inputNum <= 0) {
-            amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng nhập phải lớn hơn 0.");
-        }
-    }
-
     public void addHandler() {
         // Nhập thêm hàng từ products có sẵn
         Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
         try {
-            validateAmount();
+            ValidationServices v = new ValidationServices();
+            String amt = amountTxt.getText();
+            v.validateImportQuantity(amt);
+
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
             return;
         }
         Product product = updatedProducts.stream().filter(p -> p.getSKU().equals(selectedProduct.getSKU())).findFirst().orElse(null);
-        if(product == null) {
-        updatedProducts.add(selectedProduct);
-        importAmounts.put(selectedProduct, Integer.valueOf(amountTxt.getText()));
+        if (product == null) {
+            updatedProducts.add(selectedProduct);
+            importAmounts.put(selectedProduct, Integer.valueOf(amountTxt.getText()));
         } else {
-            int currentAmount =importAmounts.get(selectedProduct);
+            int currentAmount = importAmounts.get(selectedProduct);
             importAmounts.put(selectedProduct, Integer.parseInt(amountTxt.getText()) + currentAmount);
         }
         addBtn.setDisable(true);
@@ -332,7 +297,9 @@ public class StockInController implements Initializable {
             Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
             if (selectedProduct != null) {
                 try {
-                    validateAmount();
+                    ValidationServices v = new ValidationServices();
+                    String amt = amountTxt.getText();
+                    v.validateImportQuantity(amt);
                 } catch (IllegalArgumentException e) {
                     Utils.getAlert(e.getMessage()).show();
                     return;
@@ -351,12 +318,18 @@ public class StockInController implements Initializable {
 
     public void createHandler() {
         try {
-            validateNewProduct();
-            validateAmount();
+            ValidationServices v = new ValidationServices();
+            v.validateNewProduct(SKUcb.getEditor().getText(),
+                    nameTxt.getText(),
+                    priceTxt.getText(),
+                    minStockTxt.getText());
+            String amt = amountTxt.getText();
+            v.validateImportQuantity(amt);
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
             return;
         }
+
         Product product;
         product = new Product(SKUcb.getEditor().getText(),
                 nameTxt.getText(),
@@ -366,16 +339,18 @@ public class StockInController implements Initializable {
         updatedProducts.add(product);
         importAmounts.put(product, Integer.valueOf(amountTxt.getText()));
         loadTableData();
-        
+
         isCreating = false;
         toggleInputs();
         clearInputs();
-        loadComboBoxData();
+        SKUcb.getEditor().textProperty().addListener(comboBoxListener);
+        loadComboBoxData(currentProducts);
     }
 
     public void enableCreate() {
+        SKUcb.getEditor().textProperty().removeListener(comboBoxListener);
         clearInputs();
-        SKUcb.getItems().clear();
+        // SKUcb.getItems().clear(); lam fromString bi sai
 
         isCreating = true;
         stockTxt.setText("0");
@@ -389,7 +364,8 @@ public class StockInController implements Initializable {
         isEditing = false;
         toggleInputs();
         clearInputs();
-        loadComboBoxData();
+        loadComboBoxData(currentProducts);
+        SKUcb.getEditor().textProperty().addListener(comboBoxListener);
     }
 
     public void toggleInputs() {
@@ -424,7 +400,7 @@ public class StockInController implements Initializable {
             addBtn.setDisable(true);
             addNewProductBtn.setDisable(false);
             SKUcb.setDisable(false);
-            SKUcb.setEditable(false);
+            SKUcb.setEditable(true);
             nameTxt.setDisable(true);
             priceTxt.setDisable(true);
             minStockTxt.setDisable(true);
