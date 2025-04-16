@@ -26,15 +26,13 @@ public class TestOrderServices {
     @Test
     public void testGetOrderNotFound() {
         List<Order> orders = os.getOrder("khonghople", OrderStatus.ALL);
-        Assertions.assertNotNull(orders);
-        Assertions.assertEquals(0, orders.size());
+        Assertions.assertTrue(orders.isEmpty());
     }
 
     @Test
     public void testGetOrderWithAllStatuses() {
         for (OrderStatus status : new OrderStatus[]{OrderStatus.DANG_GIAO, OrderStatus.DANG_XU_LY, OrderStatus.DA_GIAO}) {
             List<Order> orders = os.getOrder(null, status);
-            Assertions.assertNotNull(orders);
 
             for (Order order : orders) {
                 Assertions.assertEquals(status, order.getOrderStatus());
@@ -48,7 +46,7 @@ public class TestOrderServices {
         List<OrderDetail> details = os.getOrderDetail(orderID);
         Assertions.assertTrue(!details.isEmpty());
 
-        //Kiểm tra khớp với order id
+        // Kiểm tra khớp với order id
         for (OrderDetail od : details) {
             Assertions.assertEquals(od.getOrderID(), orderID);
         }
@@ -58,7 +56,6 @@ public class TestOrderServices {
     public void getOrderDetailWithInvalidOrderID() {
         int orderID = -1;
         List<OrderDetail> details = os.getOrderDetail(orderID);
-        Assertions.assertNotNull(details);
         Assertions.assertEquals(0, details.size());
     }
 
@@ -125,24 +122,24 @@ public class TestOrderServices {
 
         int orderID = 1;
         List<OrderDetail> original = os.getOrderDetail(orderID);
-        Assertions.assertFalse(original.isEmpty());
+        Assertions.assertTrue(!original.isEmpty());
 
         OrderDetail od = original.get(0);
         double oldPrice = od.getUnitPrice();
         int oldQuantity = od.getQuantity();
         double oldDiscount = od.getDiscount();
 
-        //Chỉnh sửa giá trị
+        // Chỉnh sửa giá trị
         od.setUnitPrice(oldPrice + 10.0);
         od.setQuantity(oldQuantity + 1);
         od.setDiscount(oldDiscount + 0.05);
         os.updateOrderDetail(List.of(od));
 
-        //Đọc lại
+        // Đọc lại
         List<OrderDetail> updated = os.getOrderDetail(orderID);
         OrderDetail updatedOd = updated.get(0);
 
-        //Kiểm tra
+        // Kiểm tra
         Assertions.assertEquals(oldPrice + 10.0, updatedOd.getUnitPrice());
         Assertions.assertEquals(oldQuantity + 1, updatedOd.getQuantity());
         Assertions.assertEquals(oldDiscount + 0.05, updatedOd.getDiscount());
