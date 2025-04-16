@@ -103,8 +103,26 @@ public class TestOrderServices {
     }
 
     @Test
+    public void testUpdateOrder() {
+        int orderID = 1;
+        Order order = os.getOrderById(orderID);
+        Assertions.assertNotNull(order);
+
+        String oldAddress = order.getShipAddress();
+        String newAddress = "Địa chỉ test";
+        order.setShipAddress(newAddress);
+
+        os.updateOrder(order);
+        Order updated = os.getOrderById(orderID);
+
+        Assertions.assertEquals(newAddress, updated.getShipAddress());
+        order.setShipAddress(oldAddress);
+        os.updateOrder(order);
+    }
+
+    @Test
     public void testUpdateOrderDetail() {
-        
+
         int orderID = 1;
         List<OrderDetail> original = os.getOrderDetail(orderID);
         Assertions.assertFalse(original.isEmpty());
@@ -135,5 +153,5 @@ public class TestOrderServices {
         od.setDiscount(oldDiscount);
         os.updateOrderDetail(List.of(od));
     }
-    
+
 }
