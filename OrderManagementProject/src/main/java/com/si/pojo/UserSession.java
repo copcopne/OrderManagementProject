@@ -4,8 +4,6 @@
  */
 package com.si.pojo;
 
-import com.si.pojo.User;
-
 /**
  *
  * @author copcopne

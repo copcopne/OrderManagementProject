@@ -47,12 +47,15 @@ public class UserServices {
 
     public List<User> findUsers(String kw) {
         List<User> users = new ArrayList<>();
+        if (kw == null || kw.contains("%") || kw.contains("_"))
+            return users;
+        
         String queryAll = "SELECT * FROM Users";
         String queryByFullName = "SELECT * FROM Users WHERE FullName LIKE ?";
         String queryByUsername = "SELECT * FROM Users WHERE Username LIKE ?";
 
         try (Connection conn = JdbcUtils.getConn()) {
-            if (kw == null || kw.trim().isEmpty()) {
+            if (kw.trim().isEmpty()) {
                 try (PreparedStatement stm = conn.prepareStatement(queryAll); ResultSet rs = stm.executeQuery()) {
                     while (rs.next()) {
                         users.add(new User(rs.getInt("UserID"), rs.getString("FullName"),
@@ -92,6 +95,7 @@ public class UserServices {
     }
 
     public boolean createUser(String fullName, String username, String password, boolean isAdmin) {
+        String[] inputs = {};
         try {
             if (this.findUserByUsername(username) != null) {
                 throw new IllegalArgumentException("User already exists: " + username);
