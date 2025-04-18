@@ -13,14 +13,15 @@ public class ValidationServices {
     private static final String FULLNAME_REGEX = "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưẠ-ỹ\\s]+$";
 
     
-    public static void isPasswordValid(String password) throws IllegalArgumentException {
+    public static void validatePassword(String password) throws IllegalArgumentException {
         if (password.length() < 8) {
             throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
         }
     }
     
     public static void validateUserData(String username, String fullName) throws IllegalArgumentException {
-        if (username.isEmpty() || username.isBlank())
+        if(username != null) {
+        if (username.isBlank())
             throw new IllegalArgumentException("Tên người dùng không được để trống!");
         
         if (username.length() < 6 || username.length() > 20)
@@ -28,14 +29,15 @@ public class ValidationServices {
         
         if (!username.matches(USERNAME_REGEX))
             throw new IllegalArgumentException("Tên người dùng không được chứa ký tự đặc biệt!");
-
-        if (fullName.isEmpty() || fullName.isBlank())
+        }
+        if(fullName !=null) {
+        if (fullName.isBlank())
             throw new IllegalArgumentException("Tên không được để trống!");
 
         if (fullName.length() > 50)
             throw new IllegalArgumentException("Tên không được quá 50 ký tự!");
         
         if (!fullName.matches(FULLNAME_REGEX))
-            throw new IllegalArgumentException("Tên không được chứa ký tự đặc biệt!");
+            throw new IllegalArgumentException("Tên không được chứa ký tự đặc biệt!");}
     }
 }

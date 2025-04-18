@@ -100,7 +100,7 @@ public class UserServices {
                 throw new IllegalArgumentException("User already exists: " + username);
             }
             ValidationServices.validateUserData(username, fullName);
-            ValidationServices.isPasswordValid(password);
+            ValidationServices.validatePassword(password);
 
             String query = "INSERT INTO Users (FullName, Username, Password, IsAdmin) VALUES (?, ?, ?, ?)";
             try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
@@ -189,7 +189,7 @@ public class UserServices {
             updates.add("Username = ?");
         }
         if (hasPassword) {
-            ValidationServices.isPasswordValid(password);
+            ValidationServices.validatePassword(password);
             updates.add("Password = ?");
         }
         if (hasIsAdmin) {
