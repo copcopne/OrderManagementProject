@@ -5,8 +5,8 @@
 package com.si.ordermanagementproject;
 
 import com.si.pojo.User;
-import com.si.services.AuthServices;
 import com.si.services.UserServices;
+import com.si.services.ValidationServices;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -80,7 +80,7 @@ public class AddUserController implements Initializable {
             return;
         }
         try {
-            AuthServices.isPasswordValid(passwordTxt.getText());
+            ValidationServices.isPasswordValid(passwordTxt.getText());
         } catch(IllegalArgumentException e) {
             Utils.getAlert("Lỗi: " + e.getMessage()).show();
             passwordTxt.requestFocus();

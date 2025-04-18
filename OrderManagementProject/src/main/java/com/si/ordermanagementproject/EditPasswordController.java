@@ -8,6 +8,7 @@ import com.si.pojo.UserSession;
 import com.si.pojo.User;
 import com.si.services.AuthServices;
 import com.si.services.UserServices;
+import com.si.services.ValidationServices;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -79,7 +80,7 @@ public class EditPasswordController implements Initializable {
         }
         
         try {
-            AuthServices.isPasswordValid(newP);
+            ValidationServices.isPasswordValid(newP);
         }
         catch (IllegalArgumentException ex) {
             Utils.getAlert(ex.getMessage()).show();
