@@ -15,10 +15,10 @@ import java.util.Base64;
 public class PasswordHasher {
     private PasswordHasher() {}
     
-    public static String hashPassword(String username, String password) {
+    public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String mixedInput = mixStrings(username, password);
+            String mixedInput = mixStrings(password, password);
             byte[] hashedBytes = digest.digest(mixedInput.getBytes());
             return Base64.getEncoder().encodeToString(hashedBytes);
         } catch (NoSuchAlgorithmException e) {

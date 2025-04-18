@@ -101,11 +101,11 @@ public class UserServices {
                 throw new IllegalArgumentException("User already exists: " + username);
             }
 
-            AuthServices.isPasswordValid(password);
+            ValidationServices.isPasswordValid(password);
 
             String query = "INSERT INTO Users (FullName, Username, Password, IsAdmin) VALUES (?, ?, ?, ?)";
             try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
-                String hashedPassword = PasswordHasher.hashPassword(username, password);
+                String hashedPassword = PasswordHasher.hashPassword(password);
                 stm.setString(1, fullName);
                 stm.setString(2, username);
                 stm.setString(3, hashedPassword);
@@ -206,8 +206,7 @@ public class UserServices {
                 stm.setString(index++, newUsername);
             }
             if (hasPassword) {
-                stm.setString(index++, PasswordHasher.hashPassword(
-                        hasUsername ? newUsername : currentUsername, password));
+                stm.setString(index++, PasswordHasher.hashPassword(password));
             }
             if (hasIsAdmin) {
                 stm.setBoolean(index++, isAdmin);
