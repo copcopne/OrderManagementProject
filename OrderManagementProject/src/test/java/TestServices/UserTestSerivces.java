@@ -97,7 +97,9 @@ public class UserTestSerivces {
     
     @Test
     public void testCreateUser_Success() {
-        
+        String username = "test123";
+        String fullName = "Test 123";
+        String rawPassword = "test1234";
     }
     
     @Test

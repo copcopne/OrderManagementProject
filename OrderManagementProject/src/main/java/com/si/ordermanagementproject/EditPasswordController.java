@@ -8,7 +8,6 @@ import com.si.pojo.UserSession;
 import com.si.pojo.User;
 import com.si.services.AuthServices;
 import com.si.services.UserServices;
-import com.si.services.ValidationServices;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -26,6 +25,7 @@ import javafx.scene.control.PasswordField;
  * @author copcopne
  */
 public class EditPasswordController implements Initializable {
+
     @FXML
     private PasswordField oldPassword;
     @FXML
@@ -36,73 +36,69 @@ public class EditPasswordController implements Initializable {
     private Button ok;
     @FXML
     private Button cancel;
-    
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
-    
+    }
+
     public void cancel() {
         cancel.getScene().getWindow().hide();
     }
 
     public void process() {
         String currentUserUsername = UserSession.getInstance().getUsername();
-        
+
         User u = AuthServices.authenticate(currentUserUsername, oldPassword.getText());
-        
+
         if (u == null) {
             Utils.getAlert("Mật khẩu hiện tại không đúng!").show();
             oldPassword.requestFocus();
             return;
         }
-        
+
         String newP = newPassword.getText();
         String confirmP = confirmPassword.getText();
-        
-        if(newP.isEmpty()){
+
+        if (newP.isEmpty()) {
             Utils.getAlert("Mật khẩu mới không được trống!").show();
             newPassword.requestFocus();
             return;
         }
-        if(confirmP.isEmpty()){
+        if (confirmP.isEmpty()) {
             Utils.getAlert("Mật khẩu xác nhận không được trống!").show();
             confirmPassword.requestFocus();
             return;
         }
-        if(!newP.equals(confirmP)) {
+        if (!newP.equals(confirmP)) {
             Utils.getAlert("Mật khẩu đã nhập không khớp!").show();
             newPassword.requestFocus();
             return;
         }
-        
+
         try {
-            ValidationServices.isPasswordValid(newP);
-        }
-        catch (IllegalArgumentException ex) {
+            Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn lưu thay đổi không?");
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    UserServices s = new UserServices();
+                    s.updateUser(currentUserUsername, null, null, newP, null);
+
+                    Utils.getAlert("Cập nhật mật khẩu thành công!").showAndWait();
+                    this.ok.getScene().getWindow().hide();
+
+                } catch (IllegalArgumentException ex) {
+                    Utils.getAlert("LỖI dữ liệu đầu vào: " + ex.getMessage()).show();
+                } catch (SQLException ex) {
+                    Utils.getAlert("LỖI truy vấn: " + ex.getMessage()).show();
+                }
+            }
+        } catch (IllegalArgumentException ex) {
             Utils.getAlert(ex.getMessage()).show();
             newPassword.requestFocus();
-            return;
-        }
-        
-        Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn lưu thay đổi không?");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                UserServices s = new UserServices();
-                s.updateUser(currentUserUsername, null, null, newP, null);
-                
-                Utils.getAlert("Cập nhật mật khẩu thành công!").showAndWait();
-                this.ok.getScene().getWindow().hide();
-                
-            } catch (IllegalArgumentException ex) {
-                Utils.getAlert("LỖI dữ liệu đầu vào: " + ex.getMessage()).show();
-            } catch (SQLException ex) {
-                Utils.getAlert("LỖI truy vấn: " + ex.getMessage()).show();
-            }
         }
     }
 }

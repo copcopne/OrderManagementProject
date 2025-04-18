@@ -10,7 +10,7 @@ package com.si.services;
  */
 public class ValidationServices {
     public static void isPasswordValid(String password) throws IllegalArgumentException {
-        if (password.length() < 8) {
+        if (password.length() <= 8) {
             throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
         }
     }

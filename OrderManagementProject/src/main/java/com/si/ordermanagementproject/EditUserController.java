@@ -8,7 +8,6 @@ import com.si.pojo.UserSession;
 import com.si.pojo.User;
 import com.si.services.AuthServices;
 import com.si.services.UserServices;
-import com.si.services.ValidationServices;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -118,7 +117,6 @@ public class EditUserController implements Initializable {
                 if (u == null) {
                     throw new IllegalArgumentException("Mật khẩu không đúng!");
                 }}
-                ValidationServices.validateUserData(usernameTxt.getText(), fullNameTxt.getText());
                 boolean rs = s.updateUser(currentUsername, usernameTxt.getText(), fullNameTxt.getText(), null, isAdmin.isSelected());
                 if (rs == true) {
                     Utils.getAlert("Cập nhật thành công!").showAndWait();

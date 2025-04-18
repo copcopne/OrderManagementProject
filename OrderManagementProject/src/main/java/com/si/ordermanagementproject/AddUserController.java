@@ -6,7 +6,6 @@ package com.si.ordermanagementproject;
 
 import com.si.pojo.User;
 import com.si.services.UserServices;
-import com.si.services.ValidationServices;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -80,25 +79,23 @@ public class AddUserController implements Initializable {
             return;
         }
         try {
-            ValidationServices.isPasswordValid(passwordTxt.getText());
-        } catch(IllegalArgumentException e) {
+            Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn tạo không?");
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                boolean rs = s.createUser(fullNameTxt.getText(), usernameTxt.getText(),
+                        passwordTxt.getText(), isAdmin.isSelected());
+                if (rs == false) {
+                    Utils.getAlert("Lỗi khi tạo người dùng mới!").show();
+                    return;
+                }
+                Utils.getAlert("Tạo thành công!").showAndWait();
+                ok.getScene().getWindow().hide();
+            }
+        } catch (IllegalArgumentException e) {
             Utils.getAlert("Lỗi: " + e.getMessage()).show();
             passwordTxt.requestFocus();
-            return;
         }
 
-        Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn tạo không?");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean rs = s.createUser(fullNameTxt.getText(), usernameTxt.getText(),
-                    passwordTxt.getText(), isAdmin.isSelected());
-            if (rs == false) {
-                Utils.getAlert("Lỗi khi tạo người dùng mới!").show();
-                return;
-            }
-            Utils.getAlert("Tạo thành công!").showAndWait();
-            ok.getScene().getWindow().hide();
-        }
     }
 
     public void cancel() {

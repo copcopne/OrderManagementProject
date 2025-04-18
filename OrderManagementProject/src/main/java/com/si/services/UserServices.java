@@ -100,7 +100,7 @@ public class UserServices {
             if (this.findUserByUsername(username) != null) {
                 throw new IllegalArgumentException("User already exists: " + username);
             }
-
+            ValidationServices.validateUserData(username, fullName);
             ValidationServices.isPasswordValid(password);
 
             String query = "INSERT INTO Users (FullName, Username, Password, IsAdmin) VALUES (?, ?, ?, ?)";
@@ -186,15 +186,18 @@ public class UserServices {
             updates.add("FullName = ?");
         }
         if (hasUsername) {
+            ValidationServices.validateUserData(newUsername, fullName);
             updates.add("Username = ?");
         }
         if (hasPassword) {
+            ValidationServices.isPasswordValid(password);
             updates.add("Password = ?");
         }
         if (hasIsAdmin) {
             updates.add("IsAdmin = ?");
         }
-
+        ValidationServices.validateUserData(currentUsername, fullName);
+        
         String query = "UPDATE Users SET " + String.join(", ", updates) + " WHERE Username = ?";
 
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
