@@ -16,19 +16,10 @@ public class AuthServices {
     public static User authenticate(String username, String password){
         UserServices u = new UserServices();
         User user = u.findUserByUsername(username);
-        if (user != null && PasswordHasher.hashPassword(username, password).equals(user.getPassword())) {
+        if (user != null && PasswordHasher.hashPassword(password).equals(user.getPassword())) {
             return user;
         }
         return null;
     }
     
-    public static void isPasswordValid(String password) throws IllegalArgumentException {
-        if (password.length() < 8) {
-            throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
-        }
-
-        if (!password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$")) {
-            throw new IllegalArgumentException("Mật khẩu phải có ít nhất 1 ký tự hoa, 1 ký tự thường, 1 chữ số và 1 ký tự đặc biệt.");
-        }
-    }
 }
