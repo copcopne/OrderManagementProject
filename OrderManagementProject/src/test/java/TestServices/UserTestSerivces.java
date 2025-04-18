@@ -30,7 +30,7 @@ public class UserTestSerivces {
         String query = "INSERT INTO Users (FullName, Username, Password, IsAdmin) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            String hashedPassword = PasswordHasher.hashPassword("tester123", "123456");
+            String hashedPassword = PasswordHasher.hashPassword("123456");
             stmt.setString(1, "Tester 1");
             stmt.setString(2, "tester123");
             stmt.setString(3, hashedPassword);
@@ -71,8 +71,8 @@ public class UserTestSerivces {
     @Test
     public void testFindUserByUsername_NotFound() {
         String[] inputs = {"no_user_exists_123", "😊🔥💀", "null", "こんにちは", "%", "_", "1' OR '1'='1"};
-        for(String input: inputs){
-        User actual = service.findUserByUsername(input);
+        for (String input : inputs) {
+            User actual = service.findUserByUsername(input);
             assertNull(actual, "Expected null với input: " + input);
         }
     }
@@ -89,41 +89,54 @@ public class UserTestSerivces {
     @Test
     public void testFindUsers_Empty() {
         String[] inputs = {"no_user_exists_123", "😊🔥💀", "null", "こんにちは", "%", "_", "1' OR '1'='1"};
-        for(String input: inputs){
+        for (String input : inputs) {
             List<User> user = service.findUsers(input);
             assertTrue(user.isEmpty(), "Expected list rỗng với input: " + input);
         }
     }
-    
+
     @Test
     public void testCreateUser_Success() {
         String username = "test123";
-        String fullName = "Test 123";
+        String fullName = "Nguyễn Văn A Tester";
         String rawPassword = "test1234";
+        boolean actual = service.createUser(fullName, username, rawPassword, false);
+        assertTrue(actual, "Expected trả về true(tạo thành công) với username: "
+                + "" + username + " , và fullName: " + fullName);
+
+        service.deleteUser(username); // Dọn dẹp
     }
-    
+
     @Test
     public void testCreateUser_Failure() {
-        
+        String[] usernames = {"", "null", "admin", "1' OR '1'='1"};
+        String[] fullNames = {"", "こんにちは", "%", "1' OR '1'='1"};
+        String rawPassword = "test1234";
+        for (String fullName : fullNames) {
+            for (String username : usernames) {
+                assertFalse(service.createUser(fullName, username, rawPassword, false),
+                        "Expect trả về false(tạo thất bại) với username: " + username + " , và fullName: " + fullName);
+            }
+        }
     }
-    
+
     @Test
     public void testUpdateUser_Success() {
-        
+        String newUsername = "teo123456";
     }
-    
+
     @Test
     public void testUpdateUser_Failure() {
-        
+
     }
-    
+
     @Test
     public void testDeleteUSer_Success() {
-        
+
     }
-    
+
     @Test
     public void testDeleteUser_Failure() {
-        
+
     }
 }

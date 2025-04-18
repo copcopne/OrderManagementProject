@@ -95,7 +95,6 @@ public class UserServices {
     }
 
     public boolean createUser(String fullName, String username, String password, boolean isAdmin) {
-        String[] inputs = {};
         try {
             if (this.findUserByUsername(username) != null) {
                 throw new IllegalArgumentException("User already exists: " + username);

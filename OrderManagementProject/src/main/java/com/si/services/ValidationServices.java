@@ -9,8 +9,12 @@ package com.si.services;
  * @author copcopne
  */
 public class ValidationServices {
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9._]+$";
+    private static final String FULLNAME_REGEX = "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưẠ-ỹ\\s]+$";
+
+    
     public static void isPasswordValid(String password) throws IllegalArgumentException {
-        if (password.length() <= 8) {
+        if (password.length() < 8) {
             throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
         }
     }
@@ -22,11 +26,16 @@ public class ValidationServices {
         if (username.length() < 6 || username.length() > 20)
             throw new IllegalArgumentException("Tên người dùng phải nằm trong khoảng (6-20) ký tự!");
         
-        
+        if (!username.matches(USERNAME_REGEX))
+            throw new IllegalArgumentException("Tên người dùng không được chứa ký tự đặc biệt!");
+
         if (fullName.isEmpty() || fullName.isBlank())
             throw new IllegalArgumentException("Tên không được để trống!");
-        
+
         if (fullName.length() > 50)
-            throw  new IllegalArgumentException("Tên không được quá 50 ký tự!");
+            throw new IllegalArgumentException("Tên không được quá 50 ký tự!");
+        
+        if (!fullName.matches(FULLNAME_REGEX))
+            throw new IllegalArgumentException("Tên không được chứa ký tự đặc biệt!");
     }
 }
