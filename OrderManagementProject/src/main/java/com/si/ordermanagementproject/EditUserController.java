@@ -60,14 +60,14 @@ public class EditUserController implements Initializable {
     private Button resetPassword;
 
     UserSession session = UserSession.getInstance();
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-            passwordTxt.setDisable(true);
-            passwordTxt.setVisible(false);
-            passwordLb.setVisible(false);
-            resetPassword.setVisible(false);
-            resetPassword.setDisable(true);
+        passwordTxt.setDisable(true);
+        passwordTxt.setVisible(false);
+        passwordLb.setVisible(false);
+        resetPassword.setVisible(false);
+        resetPassword.setDisable(true);
 
     }
 
@@ -77,12 +77,11 @@ public class EditUserController implements Initializable {
         fullNameTxt.setText(selectedUser.getFullName());
         isAdmin.setSelected(selectedUser.getIsAdmin());
 
-
         if (!this.currentUsername.equals(session.getUsername())) {
             editPassword.setVisible(false);
             editPassword.setDisable(true);
         }
-        
+
         if (!session.getIsAdmin()) {
             isAdmin.setVisible(false);
             isAdmin.setDisable(true);
@@ -91,7 +90,7 @@ public class EditUserController implements Initializable {
             passwordTxt.setDisable(false);
             passwordTxt.setVisible(true);
         }
-        
+
         if (session.getIsAdmin() && !(session.getUsername().equals(this.currentUsername))) {
             resetPassword.setVisible(true);
             resetPassword.setDisable(false);
@@ -108,15 +107,16 @@ public class EditUserController implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 UserServices s = new UserServices();
-                if(session.getIsAdmin() != true){
-                    if(passwordTxt.getText().isEmpty()) {
+                if (session.getIsAdmin() != true) {
+                    if (passwordTxt.getText().isEmpty()) {
                         passwordTxt.requestFocus();
                         throw new IllegalArgumentException("Chưa xác nhận mật khẩu!");
                     }
-                User u = AuthServices.authenticate(currentUsername, passwordTxt.getText());
-                if (u == null) {
-                    throw new IllegalArgumentException("Mật khẩu không đúng!");
-                }}
+                    User u = AuthServices.authenticate(currentUsername, passwordTxt.getText());
+                    if (u == null) {
+                        throw new IllegalArgumentException("Mật khẩu không đúng!");
+                    }
+                }
                 boolean rs = s.updateUser(currentUsername, usernameTxt.getText(), fullNameTxt.getText(), null, isAdmin.isSelected());
                 if (rs == true) {
                     Utils.getAlert("Cập nhật thành công!").showAndWait();
@@ -132,22 +132,23 @@ public class EditUserController implements Initializable {
 
     public void reset() {
         if (session.getIsAdmin() == true) {
-        Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn đặt lại mật khẩu mặc định là 123456Abc@ không?");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            UserServices s = new UserServices();
-            try {
-                boolean rs = s.updateUser(currentUsername, currentUsername, fullNameTxt.getText(), "123456Abc@", null);
-                if (rs == true) {
-                    Utils.getAlert("Cập nhật thành công!").showAndWait();
-                    resetPassword.getScene().getWindow().hide();
+            Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn đặt lại mật khẩu mặc định là 123456Abc@ không?");
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                UserServices s = new UserServices();
+                try {
+                    boolean rs = s.updateUser(currentUsername, currentUsername, fullNameTxt.getText(), "123456Abc@", null);
+                    if (rs == true) {
+                        Utils.getAlert("Cập nhật thành công!").showAndWait();
+                        resetPassword.getScene().getWindow().hide();
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Utils.getAlert("LỖI dữ liệu đầu vào: " + ex.getMessage()).show();
+                } catch (SQLException ex) {
+                    Utils.getAlert("LỖI truy vấn: " + ex.getMessage()).show();
                 }
-            } catch (IllegalArgumentException ex) {
-                Utils.getAlert("LỖI dữ liệu đầu vào: " + ex.getMessage()).show();
-            } catch (SQLException ex) {
-                Utils.getAlert("LỖI truy vấn: " + ex.getMessage()).show();
             }
-        } }
+        }
     }
 
     public void editPasswordHandler() {

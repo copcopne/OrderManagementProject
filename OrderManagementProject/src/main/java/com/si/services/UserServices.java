@@ -47,9 +47,10 @@ public class UserServices {
 
     public List<User> findUsers(String kw) {
         List<User> users = new ArrayList<>();
-        if (kw == null || kw.contains("%") || kw.contains("_"))
+        if (kw == null || kw.contains("%") || kw.contains("_")) {
             return users;
-        
+        }
+
         String queryAll = "SELECT * FROM Users";
         String queryByFullName = "SELECT * FROM Users WHERE FullName LIKE ?";
         String queryByUsername = "SELECT * FROM Users WHERE Username LIKE ?";
@@ -174,18 +175,22 @@ public class UserServices {
             }
         }
 
-        boolean hasUsername = newUsername != null && !newUsername.isBlank();
-        boolean hasFullName = fullName != null && !fullName.isBlank();
-        boolean hasPassword = password != null && !password.isBlank();
+//        boolean hasUsername = newUsername != null && !newUsername.isBlank();
+//        boolean hasFullName = fullName != null && !fullName.isBlank();
+//        boolean hasPassword = password != null && !password.isBlank();
+        boolean hasUsername = newUsername != null;
+        boolean hasFullName = fullName != null;
+        boolean hasPassword = password != null;
         boolean hasIsAdmin = isAdmin != null;
 
         List<String> updates = new ArrayList<>();
 
         if (hasFullName) {
+            ValidationServices.validateUserData(null, fullName);
             updates.add("FullName = ?");
         }
         if (hasUsername) {
-            ValidationServices.validateUserData(newUsername, fullName);
+            ValidationServices.validateUserData(newUsername, null);
             updates.add("Username = ?");
         }
         if (hasPassword) {
@@ -195,8 +200,7 @@ public class UserServices {
         if (hasIsAdmin) {
             updates.add("IsAdmin = ?");
         }
-        ValidationServices.validateUserData(currentUsername, fullName);
-        
+
         String query = "UPDATE Users SET " + String.join(", ", updates) + " WHERE Username = ?";
 
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
