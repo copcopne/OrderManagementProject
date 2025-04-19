@@ -42,7 +42,7 @@ public class UserServicesTest {
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("Failed to create user: " + "tester123");
+                throw new SQLException("Failed to create user: " + username);
             }
         }
     }
@@ -56,7 +56,7 @@ public class UserServicesTest {
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("Failed to delete user: " + "tester123");
+                throw new SQLException("Failed to delete user: " + username);
             }
         }
     }

@@ -37,7 +37,7 @@ public class ValidationServices {
         if (fullName.length() > 50)
             throw new IllegalArgumentException("Tên không được quá 50 ký tự!");
         
-        if (!fullName.matches(FULLNAME_REGEX))
+        if (!fullName.trim().matches(FULLNAME_REGEX))
             throw new IllegalArgumentException("Tên không được chứa ký tự đặc biệt!");}
     }
 }

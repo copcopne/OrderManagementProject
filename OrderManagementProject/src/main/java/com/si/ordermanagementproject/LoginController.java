@@ -13,8 +13,8 @@ public class LoginController {
     
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    private App mainApp;
     private Stage loginStage;
+    private App mainApp;
 
     @FXML
     private void LoginHandler() throws IOException {

@@ -11,8 +11,8 @@ package com.si.pojo;
 public class UserSession {
     private static UserSession instance;
     private User currentUser;
-    private boolean loggedIn;
-    private boolean isAdmin;
+    private boolean loggedIn = false;
+    private boolean isAdmin = false;
     
     private UserSession() {
         this.loggedIn = false;
