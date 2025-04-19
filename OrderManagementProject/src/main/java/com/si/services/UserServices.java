@@ -45,15 +45,65 @@ public class UserServices {
         return user;
     }
 
+//    public List<User> findUsers(String kw) {
+//        List<User> users = new ArrayList<>();
+//        if (kw == null || kw.contains("%") || kw.contains("_")) {
+//            return users;
+//        }
+//
+//        String queryAll = "SELECT * FROM Users";
+//        String queryByFullName = "SELECT * FROM Users WHERE FullName LIKE ?";
+//        String queryByUsername = "SELECT * FROM Users WHERE Username LIKE ?";
+//
+//        try (Connection conn = JdbcUtils.getConn()) {
+//            if (kw.trim().isEmpty()) {
+//                try (PreparedStatement stm = conn.prepareStatement(queryAll); ResultSet rs = stm.executeQuery()) {
+//                    while (rs.next()) {
+//                        users.add(new User(rs.getInt("UserID"), rs.getString("FullName"),
+//                                rs.getString("Username"), rs.getBoolean("isAdmin")));
+//                    }
+//                }
+//            } else {
+//                try (PreparedStatement stm1 = conn.prepareStatement(queryByFullName)) {
+//                    stm1.setString(1, "%" + kw.trim() + "%");
+//                    try (ResultSet rs = stm1.executeQuery()) {
+//                        while (rs.next()) {
+//                            users.add(new User(rs.getInt("UserID"), rs.getString("FullName"),
+//                                    rs.getString("Username"), rs.getBoolean("isAdmin")));
+//                        }
+//                    }
+//                }
+//                if (users.isEmpty()) {
+//                    try (PreparedStatement stm2 = conn.prepareStatement(queryByUsername)) {
+//                        stm2.setString(1, "%" + kw.trim() + "%");
+//                        try (ResultSet rs = stm2.executeQuery()) {
+//                            while (rs.next()) {
+//                                users.add(new User(rs.getInt("UserID"), rs.getString("FullName"),
+//                                        rs.getString("Username"), rs.getBoolean("isAdmin")));
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (SQLException ex) {
+//            System.out.println("Database Error: " + ex.getMessage());
+//        } catch (Exception ex) {
+//            System.out.println("Unexpected Error: " + ex.getMessage());
+//            ex.printStackTrace();
+//        }
+//
+//        return users;
+//    }
+    
     public List<User> findUsers(String kw) {
         List<User> users = new ArrayList<>();
+
         if (kw == null || kw.contains("%") || kw.contains("_")) {
             return users;
         }
 
         String queryAll = "SELECT * FROM Users";
-        String queryByFullName = "SELECT * FROM Users WHERE FullName LIKE ?";
-        String queryByUsername = "SELECT * FROM Users WHERE Username LIKE ?";
+        String queryByKeyword = "SELECT * FROM Users WHERE FullName LIKE ? OR Username LIKE ?";
 
         try (Connection conn = JdbcUtils.getConn()) {
             if (kw.trim().isEmpty()) {
@@ -64,23 +114,14 @@ public class UserServices {
                     }
                 }
             } else {
-                try (PreparedStatement stm1 = conn.prepareStatement(queryByFullName)) {
-                    stm1.setString(1, "%" + kw + "%");
-                    try (ResultSet rs = stm1.executeQuery()) {
+                try (PreparedStatement stm = conn.prepareStatement(queryByKeyword)) {
+                    String likeKw = "%" + kw.trim() + "%";
+                    stm.setString(1, likeKw);
+                    stm.setString(2, likeKw);
+                    try (ResultSet rs = stm.executeQuery()) {
                         while (rs.next()) {
                             users.add(new User(rs.getInt("UserID"), rs.getString("FullName"),
                                     rs.getString("Username"), rs.getBoolean("isAdmin")));
-                        }
-                    }
-                }
-                if (users.isEmpty()) {
-                    try (PreparedStatement stm2 = conn.prepareStatement(queryByUsername)) {
-                        stm2.setString(1, "%" + kw + "%");
-                        try (ResultSet rs = stm2.executeQuery()) {
-                            while (rs.next()) {
-                                users.add(new User(rs.getInt("UserID"), rs.getString("FullName"),
-                                        rs.getString("Username"), rs.getBoolean("isAdmin")));
-                            }
                         }
                     }
                 }
@@ -106,8 +147,8 @@ public class UserServices {
             String query = "INSERT INTO Users (FullName, Username, Password, IsAdmin) VALUES (?, ?, ?, ?)";
             try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
                 String hashedPassword = PasswordHasher.hashPassword(password);
-                stm.setString(1, fullName);
-                stm.setString(2, username);
+                stm.setString(1, fullName.trim());
+                stm.setString(2, username.trim());
                 stm.setString(3, hashedPassword);
                 stm.setBoolean(4, isAdmin);
 
@@ -206,10 +247,10 @@ public class UserServices {
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             int index = 1;
             if (hasFullName) {
-                stm.setString(index++, fullName);
+                stm.setString(index++, fullName.trim());
             }
             if (hasUsername) {
-                stm.setString(index++, newUsername);
+                stm.setString(index++, newUsername.trim());
             }
             if (hasPassword) {
                 stm.setString(index++, PasswordHasher.hashPassword(password));
