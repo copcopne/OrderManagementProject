@@ -63,11 +63,16 @@ public class EditUserController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        passwordTxt.setDisable(true);
-        passwordTxt.setVisible(false);
-        passwordLb.setVisible(false);
-        resetPassword.setVisible(false);
-        resetPassword.setDisable(true);
+        if (!session.isLoggedIn()) {
+            Utils.getAlert("Bạn chưa đăng nhập").showAndWait();
+            ok.getScene().getWindow().hide();
+        } else {
+            passwordTxt.setDisable(true);
+            passwordTxt.setVisible(false);
+            passwordLb.setVisible(false);
+            resetPassword.setVisible(false);
+            resetPassword.setDisable(true);
+        }
 
     }
 
@@ -119,6 +124,8 @@ public class EditUserController implements Initializable {
                 }
                 boolean rs = s.updateUser(currentUsername, usernameTxt.getText(), fullNameTxt.getText(), null, isAdmin.isSelected());
                 if (rs == true) {
+                    User thisUser = s.findUserByUsername(usernameTxt.getText());
+                    session.login(thisUser);
                     Utils.getAlert("Cập nhật thành công!").showAndWait();
                     ok.getScene().getWindow().hide();
                 }
