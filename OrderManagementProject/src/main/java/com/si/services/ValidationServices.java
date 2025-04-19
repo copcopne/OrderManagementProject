@@ -1,7 +1,7 @@
 package com.si.services;
 
 public class ValidationServices {
-    public void validateExportQuantity(String rawRequested, int stock) {
+    public static void validateExportQuantity(String rawRequested, int stock) {
         if (rawRequested == null || rawRequested.isBlank()) {
             throw new IllegalArgumentException("Số lượng xuất không được để trống.");
         }
@@ -18,7 +18,7 @@ public class ValidationServices {
             throw new IllegalArgumentException("Số lượng xuất vượt quá tồn kho (" + stock + ").");
         }
     }
-    public void validateExportQuantity(int requested, int stock) {
+    public static void validateExportQuantity(int requested, int stock) {
         if (requested <= 0) {
             throw new IllegalArgumentException("Số lượng xuất phải lớn hơn 0.");
         }
@@ -27,7 +27,7 @@ public class ValidationServices {
         }
     }
 
-    public int validateImportQuantity(String rawRequested) {
+    public static int validateImportQuantity(String rawRequested) {
         if (rawRequested == null || rawRequested.isBlank()) {
             throw new IllegalArgumentException("Số lượng nhập không được để trống.");
         }
@@ -42,7 +42,7 @@ public class ValidationServices {
         }
         return requested;
     }
-    public void validateNewProduct(String sku, String name, String rawUnitPrice, String rawMinStock) {
+    public static void validateNewProduct(String sku, String name, String rawUnitPrice, String rawMinStock) {
         // Validate text fields
         if (sku == null || sku.isBlank()) {
             throw new IllegalArgumentException("Mã SKU không được để trống.");

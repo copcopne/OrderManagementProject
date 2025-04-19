@@ -284,11 +284,10 @@ public class StockOutController implements Initializable {
     public void deductHandler() {
         // Xuất hàng
         Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
-        ValidationServices v = new ValidationServices();
         int stock = selectedProduct.getStockQuantity();
         try {
             String currentAmount = amountTxt.getText();
-            v.validateExportQuantity(currentAmount, stock);
+            ValidationServices.validateExportQuantity(currentAmount, stock);
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
             return;
@@ -301,7 +300,7 @@ public class StockOutController implements Initializable {
             try {
                 int currentAmount = importAmounts.get(selectedProduct);
                 int newAmount = currentAmount + Integer.parseInt(amountTxt.getText());
-                v.validateExportQuantity(newAmount, stock);
+                ValidationServices.validateExportQuantity(newAmount, stock);
                 importAmounts.put(selectedProduct, newAmount);
             } catch (IllegalArgumentException e) {
                 Utils.getAlert("Lỗi: " + e.getMessage()).show();

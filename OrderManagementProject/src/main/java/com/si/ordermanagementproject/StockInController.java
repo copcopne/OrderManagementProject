@@ -271,9 +271,8 @@ public class StockInController implements Initializable {
         // Nhập thêm hàng từ products có sẵn
         Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
         try {
-            ValidationServices v = new ValidationServices();
             String amt = amountTxt.getText();
-            v.validateImportQuantity(amt);
+            ValidationServices.validateImportQuantity(amt);
 
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
@@ -297,9 +296,8 @@ public class StockInController implements Initializable {
             Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
             if (selectedProduct != null) {
                 try {
-                    ValidationServices v = new ValidationServices();
                     String amt = amountTxt.getText();
-                    v.validateImportQuantity(amt);
+                    ValidationServices.validateImportQuantity(amt);
                 } catch (IllegalArgumentException e) {
                     Utils.getAlert(e.getMessage()).show();
                     return;
@@ -318,13 +316,12 @@ public class StockInController implements Initializable {
 
     public void createHandler() {
         try {
-            ValidationServices v = new ValidationServices();
-            v.validateNewProduct(SKUcb.getEditor().getText(),
+            ValidationServices.validateNewProduct(SKUcb.getEditor().getText(),
                     nameTxt.getText(),
                     priceTxt.getText(),
                     minStockTxt.getText());
             String amt = amountTxt.getText();
-            v.validateImportQuantity(amt);
+            ValidationServices.validateImportQuantity(amt);
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
             return;
