@@ -98,7 +98,7 @@ public class ValidationServicesTest {
                     + rawUnitPrices[index] + ", minStock: "
                     + rawMinStocks[index]);
         }
-        
+    }
     @Test
     public void testValidatePassword_True() {
         String[] validPasswords = {"12345678", "VipPro123", "68686868", "StrongP@SSw0rD", "1' OR '1'='1"};

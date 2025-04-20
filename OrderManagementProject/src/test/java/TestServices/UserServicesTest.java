@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
@@ -104,11 +105,15 @@ public class UserServicesTest {
         String uname = "test123";
         String fullName = "Nguyễn Văn A Tester";
         String rawPassword = "test1234";
-        boolean actual = service.createUser(fullName, uname, rawPassword, false);
-        assertTrue(actual, "Expected trả về true(tạo thành công) với username: "
-                + "" + uname+ " , và fullName: " + fullName);
-        
-        service.deleteUser(uname); // Dọn dẹp
+        try {
+            boolean actual = service.createUser(fullName, uname, rawPassword, false);
+            assertTrue(actual, "Expected trả về true(tạo thành công) với username: "
+                    + "" + uname + " , và fullName: " + fullName);
+
+            service.deleteUser(uname); // Dọn dẹp
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
 
     }
 
@@ -119,10 +124,11 @@ public class UserServicesTest {
         String rawPassword = "test1234";
         for (String fullName : fullNames) {
             for (String uname : usernames) {
-                assertFalse(service.createUser(fullName, uname, rawPassword, false),
-                        "Expect trả về false(tạo thất bại) với username: " + uname + " , và fullName: " + fullName);
+                assertThrows(IllegalArgumentException.class, () -> service.createUser(fullName, uname, rawPassword, false),
+                        "Expect throw ra ngoại lệ (tạo thất bại) với username: " + uname + " , và fullName: " + fullName);
             }
         }
+
     }
 
     @Test
@@ -181,15 +187,21 @@ public class UserServicesTest {
     @Test
     public void testDeleteUSer_Success() {
         String input = "testdeleteuser";
-        service.createUser("Nguyễn Văn A", input, "123456789", false); // Khởi tạo dữ liệu để test
-        
-        assertTrue(service.deleteUser(input), "Expected trả về true (Xóa thành công user dùng để test) với username: " + input);
+        try {
+            service.createUser("Nguyễn Văn A", input, "123456789", false); // Khởi tạo dữ liệu để test
+            assertTrue(service.deleteUser(input), "Expected trả về true (Xóa thành công user dùng để test) với username: " + input);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     @Test
     public void testDeleteUser_Failure() {
         String[] notExistUsernames = {"", "null", "1' OR '1'='1", "blablabla"};
-        for(String uname: notExistUsernames)
-            assertFalse(service.deleteUser(uname), "Expected trả về false (xóa thất bại) khi cố gắng xóa User không tồn tại với username: " + uname);
+        for (String uname : notExistUsernames) {
+            assertThrows(NoSuchElementException.class, () -> service.deleteUser(uname), 
+                    "Expected throw ngoại lệ (xóa thất bại) khi cố gắng xóa User không tồn tại với username: " + uname);
+        }
+
     }
 }

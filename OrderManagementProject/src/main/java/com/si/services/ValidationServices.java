@@ -12,10 +12,9 @@ public class ValidationServices {
 
     private static final String SKU_REGEX = "^[a-zA-Z0-9._]+$";
     private static final String PRODUCTNAME_REGEX = "^[0-9aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ\\s]+$";
-  
+
     private static final String USERNAME_REGEX = "^[a-zA-Z0-9._]+$";
     private static final String FULLNAME_REGEX = "^[aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ\\s]+$";
-
 
     public static void validateExportQuantity(String rawRequested, int stock) {
         if (rawRequested == null || rawRequested.isBlank()) {
@@ -65,19 +64,19 @@ public class ValidationServices {
         if (sku == null || sku.isBlank()) {
             throw new IllegalArgumentException("Mã SKU không được để trống.");
         }
-        if(!sku.matches(SKU_REGEX)){
+        if (!sku.matches(SKU_REGEX)) {
             throw new IllegalArgumentException("Mã SKU chỉ chấp nhận tên không dấu và ký tự '.','_'.");
         }
-        if(sku.length() > 50) {
+        if (sku.length() > 50) {
             throw new IllegalArgumentException("Mã SKU không được quá 50 ký tự.");
         }
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Tên sản phẩm không được để trống.");
         }
-        if(!name.matches(PRODUCTNAME_REGEX)) {
+        if (!name.matches(PRODUCTNAME_REGEX)) {
             throw new IllegalArgumentException("Tên sản phẩm không được chứa ký tự đặc biệt.");
         }
-        if(name.length() > 100) {
+        if (name.length() > 100) {
             throw new IllegalArgumentException("Tên sản phẩm không được quá 100 ký tự.");
         }
         if (rawUnitPrice == null || rawUnitPrice.isBlank()) {
@@ -108,32 +107,40 @@ public class ValidationServices {
         if (minStock <= 0 || minStock > 100) {
             throw new IllegalArgumentException("Tồn kho tối thiểu phải trong khoảng 1–100.");
         }
-    
+    }
+
     public static void validatePassword(String password) throws IllegalArgumentException {
         if (password.length() < 8) {
             throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
         }
     }
-    
-    public static void validateUserData(String username, String fullName) throws IllegalArgumentException {
-        if(username != null) {
-        if (username.isBlank())
-            throw new IllegalArgumentException("Tên người dùng không được để trống!");
-        
-        if (username.length() < 6 || username.length() > 20)
-            throw new IllegalArgumentException("Tên người dùng phải nằm trong khoảng (6-20) ký tự!");
-        
-        if (!username.matches(USERNAME_REGEX))
-            throw new IllegalArgumentException("Tên người dùng không được chứa ký tự đặc biệt!");
-        }
-        if(fullName !=null) {
-        if (fullName.isBlank())
-            throw new IllegalArgumentException("Tên không được để trống!");
 
-        if (fullName.length() > 50)
-            throw new IllegalArgumentException("Tên không được quá 50 ký tự!");
-        
-        if (!fullName.trim().matches(FULLNAME_REGEX))
-            throw new IllegalArgumentException("Tên không được chứa ký tự đặc biệt!");}
+    public static void validateUserData(String username, String fullName) throws IllegalArgumentException {
+        if (username != null) {
+            if (username.isBlank()) {
+                throw new IllegalArgumentException("Tên người dùng không được để trống!");
+            }
+
+            if (username.length() < 6 || username.length() > 20) {
+                throw new IllegalArgumentException("Tên người dùng phải nằm trong khoảng (6-20) ký tự!");
+            }
+
+            if (!username.matches(USERNAME_REGEX)) {
+                throw new IllegalArgumentException("Tên người dùng không được chứa ký tự đặc biệt!");
+            }
+        }
+        if (fullName != null) {
+            if (fullName.isBlank()) {
+                throw new IllegalArgumentException("Tên không được để trống!");
+            }
+
+            if (fullName.length() > 50) {
+                throw new IllegalArgumentException("Tên không được quá 50 ký tự!");
+            }
+
+            if (!fullName.trim().matches(FULLNAME_REGEX)) {
+                throw new IllegalArgumentException("Tên không được chứa ký tự đặc biệt!");
+            }
+        }
     }
 }
