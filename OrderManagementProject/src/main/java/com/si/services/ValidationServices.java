@@ -108,6 +108,7 @@ public class ValidationServices {
         if (minStock <= 0 || minStock > 100) {
             throw new IllegalArgumentException("Tồn kho tối thiểu phải trong khoảng 1–100.");
         }
+    }
     
     public static void validatePassword(String password) throws IllegalArgumentException {
         if (password.length() < 8) {
