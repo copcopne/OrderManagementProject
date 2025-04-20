@@ -171,7 +171,7 @@ public class StockInController implements Initializable {
 // Load các sản phẩm đã sửa vào combobox để có thể xử lý
                     loadComboBoxData(updatedProducts);
                     SKUcb.getSelectionModel().select(selectedProduct);
-                    
+
                     Integer amount = importAmounts.get(selectedProduct);
                     setInputs(selectedProduct, amount);
                     editProduct();
@@ -297,21 +297,26 @@ public class StockInController implements Initializable {
             String amt = amountTxt.getText();
             ValidationServices.validateImportQuantity(amt);
 
+            Product product = updatedProducts.stream().filter(p -> p.getSKU().equals(selectedProduct.getSKU())).findFirst().orElse(null);
+            if (product == null) {
+                updatedProducts.add(selectedProduct);
+                importAmounts.put(selectedProduct, Integer.valueOf(amountTxt.getText()));
+            } else {
+                int currentAmount = importAmounts.get(selectedProduct);
+//                importAmounts.put(selectedProduct, Integer.parseInt(amountTxt.getText()) + currentAmount);
+
+// Validate số lượng nhập nếu sản phẩm đã nằm trong danh sách nhập từ trước
+                int newAmount = currentAmount + Integer.parseInt(amountTxt.getText());
+                ValidationServices.validateImportQuantity(String.valueOf(newAmount));
+                importAmounts.put(selectedProduct, newAmount);
+            }
+            addBtn.setDisable(true);
+            toggleInputs();
+            loadTableData();
+
         } catch (IllegalArgumentException e) {
             Utils.getAlert(e.getMessage()).show();
-            return;
         }
-        Product product = updatedProducts.stream().filter(p -> p.getSKU().equals(selectedProduct.getSKU())).findFirst().orElse(null);
-        if (product == null) {
-            updatedProducts.add(selectedProduct);
-            importAmounts.put(selectedProduct, Integer.valueOf(amountTxt.getText()));
-        } else {
-            int currentAmount = importAmounts.get(selectedProduct);
-            importAmounts.put(selectedProduct, Integer.parseInt(amountTxt.getText()) + currentAmount);
-        }
-        addBtn.setDisable(true);
-        toggleInputs();
-        loadTableData();
     }
 
     public void saveEditedProductHandler() {
