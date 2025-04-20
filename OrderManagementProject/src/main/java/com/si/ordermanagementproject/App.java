@@ -8,32 +8,30 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * JavaFX App
- */
 public class App extends Application {
 
-    private static Scene scene;
+    private static Stage primaryStage;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("stockIn"));
-        stage.setTitle("Quản lý");
-        stage.setScene(scene);
-        stage.show();
+        primaryStage = stage;
+        primaryStage.setTitle("Quản lý đơn hàng");
+        primaryStage.setResizable(false);
+
+        // Gọi cửa sổ đăng nhập từ LoginStage
+        LoginStage.showLoginStage(primaryStage, this);
     }
 
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+    // Hiển thị cửa sổ chính sau khi đăng nhập thành công
+    public void showMainStage() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("userManagement.fxml"));
+        Parent root = loader.load();
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
         launch();
     }
-
+    
 }
