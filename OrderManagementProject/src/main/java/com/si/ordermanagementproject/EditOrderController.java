@@ -65,19 +65,37 @@ public class EditOrderController implements Initializable {
         colUnitPrice.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
         colUnitPrice.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
-            od.setUnitPrice(event.getNewValue());
+            Double newValue = event.getNewValue();
+            if (newValue == null || newValue < 0) {
+                showError("Đơn giá không hợp lệ! Vui lòng nhập số nguyên ≥ 0.");
+                tbOrderDetails.refresh();
+                return;
+            }
+            od.setUnitPrice(newValue);
         });
 
         colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.IntegerStringConverter()));
         colQuantity.setOnEditCommit(event -> {
-            OrderDetail detail = event.getRowValue();
-            detail.setQuantity(event.getNewValue());
+            OrderDetail od = event.getRowValue();
+            Integer newValue = event.getNewValue();
+            if (newValue == null || newValue < 0) {
+                showError("Số lượng không hợp lệ! Vui lòng nhập số nguyên ≥ 0.");
+                tbOrderDetails.refresh();
+                return;
+            }
+            od.setUnitPrice(newValue);
         });
 
         colDiscount.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
         colDiscount.setOnEditCommit(event -> {
-            OrderDetail detail = event.getRowValue();
-            detail.setDiscount(event.getNewValue());
+            OrderDetail od = event.getRowValue();
+            Double newValue = event.getNewValue();
+            if (newValue == null || newValue < 0) {
+                showError("Giảm giá không hợp lệ! Vui lòng nhập số nguyên ≥ 0.");
+                tbOrderDetails.refresh();
+                return;
+            }
+            od.setUnitPrice(newValue);
         });
 
         tbOrderDetails.getColumns().addAll(colSKU, colUnitPrice, colQuantity, colDiscount);
@@ -101,5 +119,13 @@ public class EditOrderController implements Initializable {
     private void handleBack() {
         Stage stage = (Stage) txtShipAddress.getScene().getWindow();
         stage.close();
+    }
+
+    private void showError(String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle("Lỗi dữ liệu");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
