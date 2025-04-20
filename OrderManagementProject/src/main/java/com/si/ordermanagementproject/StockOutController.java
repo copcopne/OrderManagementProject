@@ -107,6 +107,11 @@ public class StockOutController implements Initializable {
                 return null;
             }
         });
+        SKUcb.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                selectHandler();
+            }
+        });
 
     }
 
@@ -252,35 +257,35 @@ public class StockOutController implements Initializable {
         cancel.getScene().getWindow().hide();
     }
 
-    public void validateAmount(Integer finalAmount) throws IllegalArgumentException {
-        String raw = amountTxt.getText();
-        if (raw.isBlank()) {
-            amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng hàng cần xuất không được để trống.");
-        }
-
-        int inputNum;
-        try {
-            inputNum = Integer.parseInt(raw);
-        } catch (NumberFormatException e) {
-            amountTxt.requestFocus();
-            throw new NumberFormatException("Số lượng xuất hàng phải là số nguyên hợp lệ.");
-        }
-
-        int toCheck = (finalAmount != null) ? finalAmount : inputNum;
-
-        int stock = SKUcb.getSelectionModel().getSelectedItem().getStockQuantity();
-
-        if (toCheck <= 0) {
-            amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng xuất phải lớn hơn 0.");
-        }
-        if (toCheck > stock) {
-            amountTxt.requestFocus();
-            throw new IllegalArgumentException("Số lượng xuất vượt quá tồn kho (" + stock + ").");
-        }
-    }
-
+//    public void validateAmount(Integer finalAmount) throws IllegalArgumentException {
+//        String raw = amountTxt.getText();
+//        if (raw.isBlank()) {
+//            amountTxt.requestFocus();
+//            throw new IllegalArgumentException("Số lượng hàng cần xuất không được để trống.");
+//        }
+//
+//        int inputNum;
+//        try {
+//            inputNum = Integer.parseInt(raw);
+//        } catch (NumberFormatException e) {
+//            amountTxt.requestFocus();
+//            throw new NumberFormatException("Số lượng xuất hàng phải là số nguyên hợp lệ.");
+//        }
+//
+//        int toCheck = (finalAmount != null) ? finalAmount : inputNum;
+//
+//        int stock = SKUcb.getSelectionModel().getSelectedItem().getStockQuantity();
+//
+//        if (toCheck <= 0) {
+//            amountTxt.requestFocus();
+//            throw new IllegalArgumentException("Số lượng xuất phải lớn hơn 0.");
+//        }
+//        if (toCheck > stock) {
+//            amountTxt.requestFocus();
+//            throw new IllegalArgumentException("Số lượng xuất vượt quá tồn kho (" + stock + ").");
+//        }
+//    }
+    
     public void deductHandler() {
         // Xuất hàng
         Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
@@ -317,17 +322,20 @@ public class StockOutController implements Initializable {
             Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
             if (selectedProduct != null) {
                 try {
-                    validateAmount(null);
+                    int stock = selectedProduct.getStockQuantity();
+                    String rawRequested = amountTxt.getText();
+                    ValidationServices.validateExportQuantity(rawRequested, stock);
+                    
+                    int newAmount = Integer.parseInt(amountTxt.getText());
+                    importAmounts.put(selectedProduct, newAmount);
+                    
+                    isEditing = false;
+                    toggleInputs();
+                    clearInputs();
+                    loadTableData();
                 } catch (IllegalArgumentException e) {
                     Utils.getAlert(e.getMessage()).show();
-                    return;
                 }
-                int newAmount = Integer.parseInt(amountTxt.getText());
-                importAmounts.put(selectedProduct, newAmount);
-                isEditing = false;
-                toggleInputs();
-                clearInputs();
-                loadTableData();
             }
         }
     }
