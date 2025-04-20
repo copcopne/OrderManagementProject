@@ -152,12 +152,14 @@ public class StockOutController implements Initializable {
                 editBtn.setOnAction(evt -> {
                     TableRow currentRow = getTableRow();
                     Product selectedProduct = (Product) currentRow.getItem();
-                    for (Product p : SKUcb.getItems()) {
-                        if (p.getSKU().equals(selectedProduct.getSKU())) {
-                            SKUcb.getSelectionModel().select(p);
-                            break;
-                        }
-                    }
+//                    for (Product p : SKUcb.getItems()) {
+//                        if (p.getSKU().equals(selectedProduct.getSKU())) {
+//                            SKUcb.getSelectionModel().select(p);
+//                            break;
+//                        }
+//                    }
+
+                    SKUcb.setValue(selectedProduct);
                     Integer amount = importAmounts.get(selectedProduct);
                     setInputs(selectedProduct, amount);
                     editProduct();
@@ -182,7 +184,7 @@ public class StockOutController implements Initializable {
 
             {
                 delBtn.setOnAction(evt -> {
-                    if(isEditing) {
+                    if (isEditing) {
                         Utils.getAlert("Vui lòng hoàn thành chỉnh sửa trước!").showAndWait();
                         return;
                     }
@@ -195,8 +197,9 @@ public class StockOutController implements Initializable {
                         if (matched != null) {
                             updatedProducts.remove(matched);
                             Utils.getAlert("Xóa thành công.").show();
-                            if (isEditing)
+                            if (isEditing) {
                                 isEditing = false;
+                            }
                             clearInputs();
                             toggleInputs();
                             loadTableData();
@@ -293,7 +296,6 @@ public class StockOutController implements Initializable {
 //            throw new IllegalArgumentException("Số lượng xuất vượt quá tồn kho (" + stock + ").");
 //        }
 //    }
-    
     public void deductHandler() {
         // Xuất hàng
         Product selectedProduct = SKUcb.getValue();
@@ -333,10 +335,10 @@ public class StockOutController implements Initializable {
                     int stock = selectedProduct.getStockQuantity();
                     String rawRequested = amountTxt.getText();
                     ValidationServices.validateExportQuantity(rawRequested, stock);
-                    
+
                     int newAmount = Integer.parseInt(amountTxt.getText());
                     importAmounts.put(selectedProduct, newAmount);
-                    
+
                     isEditing = false;
                     toggleInputs();
                     clearInputs();
