@@ -36,10 +36,10 @@ public class ProductServices {
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Product q = new Product(rs.getString("SKU"),
-                         rs.getString("ProductName"),
-                         rs.getInt("StockQuantity"),
-                         rs.getFloat("UnitPrice"),
-                         rs.getInt("MinStockLevel"));
+                        rs.getString("ProductName"),
+                        rs.getInt("StockQuantity"),
+                        rs.getFloat("UnitPrice"),
+                        rs.getInt("MinStockLevel"));
 
                 results.add(q);
             }
@@ -89,12 +89,12 @@ public class ProductServices {
             Logger.getLogger(ProductServices.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public List<Product> getProducts(String kw, List<Product> source) {
         if (kw == null || kw.trim().isEmpty()) {
             return new ArrayList<>(source);
         }
-        String lowerKw = kw.toLowerCase();
+        String lowerKw = kw.toLowerCase().trim();
         return source.stream()
                 .filter(p -> p.getSKU().toLowerCase().contains(lowerKw))
                 .collect(Collectors.toList());
@@ -102,6 +102,8 @@ public class ProductServices {
 
     public boolean deductStock(Product p, int num) {
         try (Connection conn = JdbcUtils.getConn()) {
+            ValidationServices.validateExportQuantity(num, p.getStockQuantity());
+
             String sql = "UPDATE Products "
                     + "SET StockQuantity = StockQuantity - ? "
                     + "WHERE SKU = ?";
@@ -115,6 +117,8 @@ public class ProductServices {
             return true;
         } catch (SQLException ex) {
             System.out.println("Database Error: " + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Argument Error:" + ex.getMessage());
         } catch (Exception ex) {
             System.out.println("Unexpected Error: " + ex.getMessage());
             ex.printStackTrace();
@@ -151,6 +155,8 @@ public class ProductServices {
 
     public boolean addStock(Product p, int num) {
         try (Connection conn = JdbcUtils.getConn()) {
+            ValidationServices.validateImportQuantity(String.valueOf(num));
+            
             String sql = "UPDATE Products "
                     + "SET StockQuantity = StockQuantity + ? "
                     + "WHERE SKU = ?";
@@ -164,6 +170,8 @@ public class ProductServices {
             return true;
         } catch (SQLException ex) {
             System.out.println("Database Error: " + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Argument Error:" + ex.getMessage());
         } catch (Exception ex) {
             System.out.println("Unexpected Error: " + ex.getMessage());
             ex.printStackTrace();
@@ -173,10 +181,14 @@ public class ProductServices {
 
     public boolean addProduct(Product p) {
         try (Connection conn = JdbcUtils.getConn()) {
+            ValidationServices.validateNewProduct(p.getSKU(), 
+                    p.getProductName(), String.valueOf(p.getUnitPrice()), 
+                    String.valueOf(p.getMinStockLevel()));
+            
             String sql = "INSERT into Products (SKU, ProductName, StockQuantity, UnitPrice, MinStockLevel) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, p.getSKU());
-            stmt.setString(2, p.getProductName());
+            stmt.setString(1, p.getSKU().trim());
+            stmt.setString(2, p.getProductName().trim());
             stmt.setInt(3, p.getStockQuantity());
             stmt.setFloat(4, p.getUnitPrice());
             stmt.setInt(5, p.getMinStockLevel());
