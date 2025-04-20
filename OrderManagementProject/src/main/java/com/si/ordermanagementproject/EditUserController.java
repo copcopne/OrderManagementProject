@@ -124,8 +124,12 @@ public class EditUserController implements Initializable {
                 }
                 boolean rs = s.updateUser(currentUsername, usernameTxt.getText(), fullNameTxt.getText(), null, isAdmin.isSelected());
                 if (rs == true) {
-                    User thisUser = s.findUserByUsername(usernameTxt.getText());
-                    session.login(thisUser);
+//                    User thisUser = s.findUserByUsername(usernameTxt.getText());
+//                    session.login(thisUser);
+                    if (!session.getIsAdmin() || session.getUsername().equals(usernameTxt.getText())) {
+                        User thisUser = s.findUserByUsername(usernameTxt.getText());
+                        session.login(thisUser);
+                    }
                     Utils.getAlert("Cập nhật thành công!").showAndWait();
                     ok.getScene().getWindow().hide();
                 }
