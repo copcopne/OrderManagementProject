@@ -3,7 +3,7 @@ package com.si.services;
 public class ValidationServices {
 
     private static final String SKU_REGEX = "^[a-zA-Z0-9._]+$";
-    private static final String PRODUCTNAME_REGEX = "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưẠ-ỹ\\s]+$";
+    private static final String PRODUCTNAME_REGEX = "^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưẠ-ỹ\\s]+$";
 
     public static void validateExportQuantity(String rawRequested, int stock) {
         if (rawRequested == null || rawRequested.isBlank()) {
@@ -54,7 +54,7 @@ public class ValidationServices {
             throw new IllegalArgumentException("Mã SKU không được để trống.");
         }
         if(!sku.matches(SKU_REGEX)){
-            throw new IllegalArgumentException("Mã SKU chỉ chấp nhận tên không dấu và ký tự '.','_' .");
+            throw new IllegalArgumentException("Mã SKU chỉ chấp nhận tên không dấu và ký tự '.','_'.");
         }
         if(sku.length() > 50) {
             throw new IllegalArgumentException("Mã SKU không được quá 50 ký tự.");
