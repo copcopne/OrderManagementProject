@@ -7,6 +7,7 @@ package com.si.ordermanagementproject;
 import com.si.pojo.User;
 import com.si.services.UserServices;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -75,27 +76,26 @@ public class AddUserController implements Initializable {
             return;
         }
         if (!passwordTxt.getText().equals(confirmPasswordTxt.getText())) {
+            passwordTxt.requestFocus();
             Utils.getAlert("Mật khẩu đã nhập không khớp!").show();
             return;
         }
-        try {
-            Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn tạo không?");
-            Optional<ButtonType> result = confirm.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
+        Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn tạo không?");
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
                 boolean rs = s.createUser(fullNameTxt.getText(), usernameTxt.getText(),
                         passwordTxt.getText(), isAdmin.isSelected());
-                if (rs == false) {
-                    Utils.getAlert("Lỗi khi tạo người dùng mới!").show();
-                    return;
+                if (rs == true) {
+                    Utils.getAlert("Tạo thành công!").showAndWait();
+                    ok.getScene().getWindow().hide();
                 }
-                Utils.getAlert("Tạo thành công!").showAndWait();
-                ok.getScene().getWindow().hide();
+            } catch (IllegalArgumentException ex) {
+                Utils.getAlert("LỖI dữ liệu đầu vào: " + ex.getMessage()).show();
+            } catch (SQLException ex) {
+                Utils.getAlert("LỖI truy vấn: " + ex.getMessage()).show();
             }
-        } catch (IllegalArgumentException e) {
-            Utils.getAlert("Lỗi: " + e.getMessage()).show();
-            passwordTxt.requestFocus();
         }
-
     }
 
     public void cancel() {

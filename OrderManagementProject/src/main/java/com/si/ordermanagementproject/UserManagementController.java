@@ -9,6 +9,8 @@ import com.si.pojo.User;
 import com.si.services.UserServices;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -131,13 +133,15 @@ public class UserManagementController implements Initializable {
                     Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn xóa người dùng này không?");
                     Optional<ButtonType> result = confirm.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.OK) {
-                        UserServices s = new UserServices();
-                        if (s.deleteUser(selectedUser.getUsername()) != true) {
-                            Utils.getAlert("Không thể xóa người dùng này.").show();
-                            return;
+                        try {
+                            UserServices s = new UserServices();
+                            if (s.deleteUser(selectedUser.getUsername()) == true) {
+                                Utils.getAlert("Xóa thành công.").show();
+                                loadTableData("");
+                            }
+                        } catch (SQLException | NoSuchElementException ex) {
+                            Utils.getAlert("Không thể xóa người dùng này: " + ex.getMessage()).show();
                         }
-                        Utils.getAlert("Xóa thành công.").show();
-                        loadTableData("");
                     }
                     currentRow.setStyle("");
                 });
