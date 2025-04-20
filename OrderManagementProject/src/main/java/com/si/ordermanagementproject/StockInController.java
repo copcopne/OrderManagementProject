@@ -168,7 +168,8 @@ public class StockInController implements Initializable {
 //                            break;
 //                        }
 //                    }
-// Load các sản phẩm đã sửa vào combobox để có thể xử lý
+// Xóa combobox và load các sản phẩm đã sửa vào combobox để có thể xử lý
+                    clearInputs();
                     loadComboBoxData(updatedProducts);
                     SKUcb.getSelectionModel().select(selectedProduct);
 
