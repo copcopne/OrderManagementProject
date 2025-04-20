@@ -321,7 +321,8 @@ public class StockInController implements Initializable {
 
     public void saveEditedProductHandler() {
         if (isEditing) {
-            Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
+            Product selectedProduct = SKUcb.getValue();
+            System.out.println(selectedProduct);
             if (selectedProduct != null) {
                 try {
                     String amt = amountTxt.getText();
