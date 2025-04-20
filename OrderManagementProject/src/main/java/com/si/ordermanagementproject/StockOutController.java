@@ -182,6 +182,10 @@ public class StockOutController implements Initializable {
 
             {
                 delBtn.setOnAction(evt -> {
+                    if(isEditing) {
+                        Utils.getAlert("Vui lòng hoàn thành chỉnh sửa trước!").showAndWait();
+                        return;
+                    }
                     Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn xóa không?");
                     Optional<ButtonType> result = confirm.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.OK) {

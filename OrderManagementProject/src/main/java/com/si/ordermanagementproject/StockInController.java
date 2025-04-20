@@ -156,6 +156,10 @@ public class StockInController implements Initializable {
 
             {
                 editBtn.setOnAction(evt -> {
+                    if(isCreating) {
+                        Utils.getAlert("Vui lòng hoàn thành thêm sản phẩm trước!").showAndWait();
+                        return;
+                    }
                     TableRow currentRow = getTableRow();
                     Product selectedProduct = (Product) currentRow.getItem();
                     for (Product p : SKUcb.getItems()) {
@@ -188,6 +192,10 @@ public class StockInController implements Initializable {
 
             {
                 delBtn.setOnAction(evt -> {
+                    if(isCreating) {
+                        Utils.getAlert("Vui lòng hoàn thành thêm sản phẩm trước!").showAndWait();
+                        return;
+                    }
                     Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn xóa không?");
                     Optional<ButtonType> result = confirm.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.OK) {
