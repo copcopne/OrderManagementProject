@@ -191,6 +191,10 @@ public class StockOutController implements Initializable {
                         if (matched != null) {
                             updatedProducts.remove(matched);
                             Utils.getAlert("Xóa thành công.").show();
+                            if (isEditing)
+                                isEditing = false;
+                            clearInputs();
+                            toggleInputs();
                             loadTableData();
                         }
                     }

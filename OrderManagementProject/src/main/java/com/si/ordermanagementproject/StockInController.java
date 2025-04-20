@@ -95,6 +95,12 @@ public class StockInController implements Initializable {
         };
 
         SKUcb.getEditor().textProperty().addListener(comboBoxListener);
+        
+        SKUcb.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                selectHandler();
+            }
+        });
 
         SKUcb.setConverter(new javafx.util.StringConverter<Product>() {
             @Override
@@ -191,7 +197,11 @@ public class StockInController implements Initializable {
                         if (matched != null) {
                             updatedProducts.remove(matched);
                             Utils.getAlert("Xóa thành công.").show();
+                            if (isEditing)
+                                isEditing = false;
                             loadTableData();
+                            clearInputs();
+                            toggleInputs();
                         }
                     }
                 });
