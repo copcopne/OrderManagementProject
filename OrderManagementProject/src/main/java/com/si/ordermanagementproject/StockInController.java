@@ -95,7 +95,7 @@ public class StockInController implements Initializable {
         };
 
         SKUcb.getEditor().textProperty().addListener(comboBoxListener);
-        
+
         SKUcb.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 selectHandler();
@@ -156,18 +156,22 @@ public class StockInController implements Initializable {
 
             {
                 editBtn.setOnAction(evt -> {
-                    if(isCreating) {
+                    if (isCreating) {
                         Utils.getAlert("Vui lòng hoàn thành thêm sản phẩm trước!").showAndWait();
                         return;
                     }
                     TableRow currentRow = getTableRow();
                     Product selectedProduct = (Product) currentRow.getItem();
-                    for (Product p : SKUcb.getItems()) {
-                        if (p.getSKU().equals(selectedProduct.getSKU())) {
-                            SKUcb.getSelectionModel().select(p);
-                            break;
-                        }
-                    }
+//                    for (Product p : SKUcb.getItems()) {
+//                        if (p.getSKU().equals(selectedProduct.getSKU())) {
+//                            SKUcb.getSelectionModel().select(p);
+//                            break;
+//                        }
+//                    }
+// Load các sản phẩm đã sửa vào combobox để có thể xử lý
+                    loadComboBoxData(updatedProducts);
+                    SKUcb.getSelectionModel().select(selectedProduct);
+                    
                     Integer amount = importAmounts.get(selectedProduct);
                     setInputs(selectedProduct, amount);
                     editProduct();
@@ -192,7 +196,7 @@ public class StockInController implements Initializable {
 
             {
                 delBtn.setOnAction(evt -> {
-                    if(isCreating) {
+                    if (isCreating) {
                         Utils.getAlert("Vui lòng hoàn thành thêm sản phẩm trước!").showAndWait();
                         return;
                     }
@@ -205,8 +209,9 @@ public class StockInController implements Initializable {
                         if (matched != null) {
                             updatedProducts.remove(matched);
                             Utils.getAlert("Xóa thành công.").show();
-                            if (isEditing)
+                            if (isEditing) {
                                 isEditing = false;
+                            }
                             loadTableData();
                             clearInputs();
                             toggleInputs();
@@ -287,7 +292,7 @@ public class StockInController implements Initializable {
 
     public void addHandler() {
         // Nhập thêm hàng từ products có sẵn
-        Product selectedProduct = SKUcb.getSelectionModel().getSelectedItem();
+        Product selectedProduct = SKUcb.getValue();
         try {
             String amt = amountTxt.getText();
             ValidationServices.validateImportQuantity(amt);
@@ -369,6 +374,7 @@ public class StockInController implements Initializable {
 
         isCreating = true;
         stockTxt.setText("0");
+        SKUcb.getItems().clear();
         toggleInputs();
         SKUcb.requestFocus();
 
