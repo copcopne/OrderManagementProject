@@ -1,6 +1,10 @@
 package com.si.services;
 
 public class ValidationServices {
+
+    private static final String SKU_REGEX = "^[a-zA-Z0-9._]+$";
+    private static final String PRODUCTNAME_REGEX = "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưẠ-ỹ\\s]+$";
+
     public static void validateExportQuantity(String rawRequested, int stock) {
         if (rawRequested == null || rawRequested.isBlank()) {
             throw new IllegalArgumentException("Số lượng xuất không được để trống.");
@@ -18,6 +22,7 @@ public class ValidationServices {
             throw new IllegalArgumentException("Số lượng xuất vượt quá tồn kho (" + stock + ").");
         }
     }
+
     public static void validateExportQuantity(int requested, int stock) {
         if (requested <= 0) {
             throw new IllegalArgumentException("Số lượng xuất phải lớn hơn 0.");
@@ -37,18 +42,31 @@ public class ValidationServices {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Số lượng nhập phải là số nguyên hợp lệ.");
         }
-        if (requested <= 0) {
-            throw new IllegalArgumentException("Số lượng nhập phải lớn hơn 0.");
+        if (requested <= 0 || requested > 1000) {
+            throw new IllegalArgumentException("Số lượng nhập phải nằm trong khoảng cho phép (1-1000).");
         }
         return requested;
     }
+
     public static void validateNewProduct(String sku, String name, String rawUnitPrice, String rawMinStock) {
         // Validate text fields
         if (sku == null || sku.isBlank()) {
             throw new IllegalArgumentException("Mã SKU không được để trống.");
         }
+        if(!sku.matches(SKU_REGEX)){
+            throw new IllegalArgumentException("Mã SKU chỉ chấp nhận tên không dấu và ký tự '.','_' .");
+        }
+        if(sku.length() > 50) {
+            throw new IllegalArgumentException("Mã SKU không được quá 50 ký tự.");
+        }
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Tên sản phẩm không được để trống.");
+        }
+        if(!name.matches(PRODUCTNAME_REGEX)) {
+            throw new IllegalArgumentException("Tên sản phẩm không được chứa ký tự đặc biệt.");
+        }
+        if(name.length() > 100) {
+            throw new IllegalArgumentException("Tên sản phẩm không được quá 100 ký tự.");
         }
         if (rawUnitPrice == null || rawUnitPrice.isBlank()) {
             throw new IllegalArgumentException("Đơn giá không được để trống.");
