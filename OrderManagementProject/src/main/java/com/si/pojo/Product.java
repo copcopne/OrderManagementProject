@@ -38,7 +38,7 @@ public class Product {
     }
 
     /**
-     * @return the StockQuanity
+     * @return the StockQuantity
      */
     public int getStockQuantity() {
         return stockQuantity;

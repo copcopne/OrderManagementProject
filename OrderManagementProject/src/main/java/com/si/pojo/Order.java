@@ -59,6 +59,14 @@ public class Order {
     public OrderStatus getOrderStatus() {
         return orderStatus;
     }
+
+    /**
+     * @param shipAddress the shipAddress to set
+     */
+    public void setShipAddress(String shipAddress) {
+        this.shipAddress = shipAddress;
+    }
     
     
 }
+

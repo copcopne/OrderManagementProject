@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 /**
  *
  * @author ttuan
@@ -47,6 +46,7 @@ public class ProductServices {
         } catch (SQLException ex) {
             Logger.getLogger(ProductServices.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return results;
     }
 

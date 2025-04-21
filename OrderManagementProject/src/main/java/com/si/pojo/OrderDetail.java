@@ -57,6 +57,28 @@ public class OrderDetail {
     public Double getDiscount() {
         return discount;
     }
+
+    /**
+     * @param unitPrice the unitPrice to set
+     */
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    /**
+     * @param quantity the quantity to set
+     */
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    /**
+     * @param discount the discount to set
+     */
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
     
     
 }
+
