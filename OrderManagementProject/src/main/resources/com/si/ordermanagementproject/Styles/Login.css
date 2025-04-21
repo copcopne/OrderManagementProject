@@ -2,7 +2,7 @@
     -fx-background-color: #bfbfbf;
 }
 
-.text-field {
+.text-field, .password-field {
     -fx-background-color: white;
     -fx-border-color: white gray gray white;
     -fx-border-width: 2px;
@@ -11,9 +11,10 @@
     -fx-font-size: 12px;
     -fx-padding: 3px;
     -fx-text-fill: black;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 1, 0, 1, 1);
 }
 
-.text-field:focused {
+.text-field:focused, .password-field:focused {
     -fx-border-color: black white white black;
     -fx-background-color: white;
 }
