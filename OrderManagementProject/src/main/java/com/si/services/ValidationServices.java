@@ -65,10 +65,10 @@ public class ValidationServices {
             throw new IllegalArgumentException("Mã SKU không được để trống.");
         }
         if (!sku.matches(SKU_REGEX)) {
-            throw new IllegalArgumentException("Mã SKU chỉ chấp nhận tên không dấu và ký tự '.','_'.");
+            throw new IllegalArgumentException("Mã SKU chỉ chấp nhận chữ không dấu và ký tự '.','_'.");
         }
-        if (sku.length() > 50) {
-            throw new IllegalArgumentException("Mã SKU không được quá 50 ký tự.");
+        if (sku.length() > 8) {
+            throw new IllegalArgumentException("Mã SKU không được quá 8 ký tự.");
         }
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Tên sản phẩm không được để trống.");
@@ -76,8 +76,8 @@ public class ValidationServices {
         if (!name.matches(PRODUCTNAME_REGEX)) {
             throw new IllegalArgumentException("Tên sản phẩm không được chứa ký tự đặc biệt.");
         }
-        if (name.length() > 100) {
-            throw new IllegalArgumentException("Tên sản phẩm không được quá 100 ký tự.");
+        if (name.length() > 50) {
+            throw new IllegalArgumentException("Tên sản phẩm không được quá 50 ký tự.");
         }
         if (rawUnitPrice == null || rawUnitPrice.isBlank()) {
             throw new IllegalArgumentException("Đơn giá không được để trống.");
@@ -112,6 +112,9 @@ public class ValidationServices {
     public static void validatePassword(String password) throws IllegalArgumentException {
         if (password.length() < 8) {
             throw new IllegalArgumentException("Mật khẩu phải từ 8 ký tự trở lên.");
+        }
+        if (password.length() > 255) {
+            throw new IllegalArgumentException("Mật khẩu không được quá 255 ký tự.");
         }
     }
 
