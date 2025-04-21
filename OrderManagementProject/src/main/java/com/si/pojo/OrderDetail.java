@@ -11,14 +11,12 @@ package com.si.pojo;
 public class OrderDetail {
     private int orderID;
     private String SKU;
-    private double unitPrice;
     private int quantity;
     private Double discount;
 
-    public OrderDetail(int orderID, String SKU, double unitPrice, int quantity, Double discount) {
+    public OrderDetail(int orderID, String SKU, int quantity, Double discount) {
         this.orderID = orderID;
         this.SKU = SKU;
-        this.unitPrice = unitPrice;
         this.quantity = quantity;
         this.discount = discount;
     }
@@ -38,13 +36,6 @@ public class OrderDetail {
     }
 
     /**
-     * @return the unitPrice
-     */
-    public double getUnitPrice() {
-        return unitPrice;
-    }
-
-    /**
      * @return the quantity
      */
     public int getQuantity() {
@@ -56,13 +47,6 @@ public class OrderDetail {
      */
     public Double getDiscount() {
         return discount;
-    }
-
-    /**
-     * @param unitPrice the unitPrice to set
-     */
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
     }
 
     /**

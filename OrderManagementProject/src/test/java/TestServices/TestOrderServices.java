@@ -1,6 +1,5 @@
 package TestServices;
 
-
 import com.si.pojo.Order;
 import com.si.pojo.OrderDetail;
 import com.si.pojo.OrderStatus;
@@ -43,14 +42,15 @@ public class TestOrderServices {
     }
 
     @Test
-    public void getOrderDetaiWithValidID() {
+    public void getOrderDetailWithValidID() {
         int orderID = 1;
         List<OrderDetail> details = os.getOrderDetail(orderID);
-        Assertions.assertTrue(!details.isEmpty());
+        Assertions.assertNotNull(details, "Details should not be null");
+        Assertions.assertFalse(details.isEmpty(), "Details should not be empty");
 
         // Kiểm tra khớp với order id
         for (OrderDetail od : details) {
-            Assertions.assertEquals(od.getOrderID(), orderID);
+            Assertions.assertEquals(od.getOrderID(), orderID, "Order ID mismatch");
         }
     }
 
@@ -127,12 +127,10 @@ public class TestOrderServices {
         Assertions.assertTrue(!original.isEmpty());
 
         OrderDetail od = original.get(0);
-        double oldPrice = od.getUnitPrice();
         int oldQuantity = od.getQuantity();
         double oldDiscount = od.getDiscount();
 
         // Chỉnh sửa giá trị
-        od.setUnitPrice(oldPrice + 10.0);
         od.setQuantity(oldQuantity + 1);
         od.setDiscount(oldDiscount + 0.05);
         os.updateOrderDetail(List.of(od));
@@ -142,12 +140,10 @@ public class TestOrderServices {
         OrderDetail updatedOd = updated.get(0);
 
         // Kiểm tra
-        Assertions.assertEquals(oldPrice + 10.0, updatedOd.getUnitPrice());
         Assertions.assertEquals(oldQuantity + 1, updatedOd.getQuantity());
         Assertions.assertEquals(oldDiscount + 0.05, updatedOd.getDiscount());
 
         //Reset lại về giá trị cũ sau test
-        od.setUnitPrice(oldPrice);
         od.setQuantity(oldQuantity);
         od.setDiscount(oldDiscount);
         os.updateOrderDetail(List.of(od));
