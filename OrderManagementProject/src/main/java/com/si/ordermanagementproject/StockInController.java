@@ -363,6 +363,16 @@ public class StockInController implements Initializable {
                 0,
                 Float.parseFloat(priceTxt.getText()),
                 Integer.parseInt(minStockTxt.getText()));
+        // Thêm kiểm tra nếu mã SKU trùng
+        boolean existOld = currentProducts.stream().anyMatch(p -> p.getSKU().equals(product.getSKU()));
+        boolean existNew = updatedProducts.stream().anyMatch(p -> p.getSKU().equals(product.getSKU()));
+        
+        if (existOld || existNew) {
+            Utils.getAlert("Mã SKU này đã tồn tại!").show();
+            SKUcb.requestFocus();
+            return;
+        }
+        
         updatedProducts.add(product);
         importAmounts.put(product, Integer.valueOf(amountTxt.getText()));
         loadTableData();
