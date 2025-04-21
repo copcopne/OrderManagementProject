@@ -50,12 +50,11 @@ public class TestProductServices {
             this.orderID = rs.getInt(1);
 
             PreparedStatement st3 = conn.prepareStatement(
-                    "INSERT INTO OrderDetails(OrderID, SKU, UnitPrice, Quantity, Discount) VALUES (?, ?, ?, ?, ?)");
+                    "INSERT INTO OrderDetails(OrderID, SKU, Quantity, Discount) VALUES (?, ?, ?, ?)");
             st3.setInt(1, orderID);
             st3.setString(2, "TestSKU");
-            st3.setFloat(3, 100.0f);
-            st3.setInt(4, 3); // Quantity < Stock
-            st3.setFloat(5, 0.0f);
+            st3.setInt(3, 3); // Quantity < Stock
+            st3.setFloat(4, 0.0f);
             st3.executeUpdate();
             conn.commit();
         }

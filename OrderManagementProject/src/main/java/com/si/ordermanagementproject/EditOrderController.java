@@ -52,53 +52,39 @@ public class EditOrderController implements Initializable {
 
     public void loadColumns() {
         TableColumn<OrderDetail, String> colSKU = new TableColumn<>("Mã SKU");
-        TableColumn<OrderDetail, Double> colUnitPrice = new TableColumn<>("Đơn giá");
         TableColumn<OrderDetail, Integer> colQuantity = new TableColumn<>("Số lượng");
         TableColumn<OrderDetail, Double> colDiscount = new TableColumn<>("Giảm giá");
 
         colSKU.setCellValueFactory(new PropertyValueFactory<>("SKU"));
-        colUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
 
         // Cho phép chỉnh sửa
-        colUnitPrice.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
-        colUnitPrice.setOnEditCommit(event -> {
-            OrderDetail od = event.getRowValue();
-            Double newValue = event.getNewValue();
-            if (newValue == null || newValue < 0) {
-                showError("Đơn giá không hợp lệ! Vui lòng nhập số nguyên ≥ 0.");
-                tbOrderDetails.refresh();
-                return;
-            }
-            od.setUnitPrice(newValue);
-        });
-
         colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.IntegerStringConverter()));
         colQuantity.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Integer newValue = event.getNewValue();
             if (newValue == null || newValue < 0) {
-                showError("Số lượng không hợp lệ! Vui lòng nhập số nguyên ≥ 0.");
+                Utils.getAlert("Số lượng không hợp lệ! Vui lòng nhập số nguyên ≥ 0.").show();
                 tbOrderDetails.refresh();
                 return;
             }
-            od.setUnitPrice(newValue);
+            od.setQuantity(newValue);
         });
 
         colDiscount.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
         colDiscount.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Double newValue = event.getNewValue();
-            if (newValue == null || newValue < 0) {
-                showError("Giảm giá không hợp lệ! Vui lòng nhập số nguyên ≥ 0.");
+            if (newValue == null || newValue < 0 || newValue > 1) {
+                Utils.getAlert("Giảm giá không hợp lệ! Vui lòng nhập số thực trong khoảng 0 - 1").show();
                 tbOrderDetails.refresh();
                 return;
             }
-            od.setUnitPrice(newValue);
+            od.setDiscount(newValue);
         });
 
-        tbOrderDetails.getColumns().addAll(colSKU, colUnitPrice, colQuantity, colDiscount);
+        tbOrderDetails.getColumns().addAll(colSKU, colQuantity, colDiscount);
     }
 
     @FXML
@@ -106,11 +92,15 @@ public class EditOrderController implements Initializable {
         this.currentOrder.setShipAddress(txtShipAddress.getText());
 
         // Cập nhật địa chỉ giao hàng
-        os.updateOrder(currentOrder);
+        boolean isOrderUpdated = os.updateOrder(currentOrder);
 
         // Cập nhật chi tiết đơn hàng
-        os.updateOrderDetail(tbOrderDetails.getItems());
-
+        boolean isOrderDetailUpdated = os.updateOrderDetail(tbOrderDetails.getItems());
+        if (!isOrderUpdated || !isOrderDetailUpdated) {
+            Utils.getAlert("Cập nhật không thành công").show();
+            return;
+        }
+        Utils.getAlert("Cập nhật thành công").show();
         Stage stage = (Stage) txtShipAddress.getScene().getWindow();
         stage.close();
     }
@@ -119,13 +109,5 @@ public class EditOrderController implements Initializable {
     private void handleBack() {
         Stage stage = (Stage) txtShipAddress.getScene().getWindow();
         stage.close();
-    }
-
-    private void showError(String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-        alert.setTitle("Lỗi dữ liệu");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

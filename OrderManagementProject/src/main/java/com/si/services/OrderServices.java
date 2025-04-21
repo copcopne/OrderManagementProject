@@ -1,5 +1,6 @@
 package com.si.services;
 
+import com.si.ordermanagementproject.Utils;
 import com.si.pojo.JdbcUtils;
 import com.si.pojo.Order;
 import com.si.pojo.OrderDetail;
@@ -58,13 +59,13 @@ public class OrderServices {
     public List<OrderDetail> getOrderDetail(int orderID) {
         List<OrderDetail> results = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT * FROM orderdetails WHERE OrderID = " + orderID;
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+            String sql = "SELECT * FROM orderdetails WHERE OrderID = ?";
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setInt(1, orderID);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 OrderDetail od = new OrderDetail(rs.getInt("orderID"),
                         rs.getString("SKU"),
-                        rs.getDouble("unitPrice"),
                         rs.getInt("quantity"),
                         rs.getDouble("discount")
                 );
@@ -111,34 +112,45 @@ public class OrderServices {
         return null;
     }
 
-    public void updateOrder(Order order) {
+    public boolean updateOrder(Order order) {
         try (Connection conn = JdbcUtils.getConn()) {
             String sql = "UPDATE orders SET ShipAddress = ? WHERE OrderID = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, order.getShipAddress());
             stmt.setInt(2, order.getOrderId());
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+
+            // Kiểm tra xem có dòng nào bị ảnh hưởng không
+            return rowsAffected > 0;
         } catch (SQLException ex) {
             Logger.getLogger(OrderServices.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 
-    public void updateOrderDetail(List<OrderDetail> orderDetails) {
+    public boolean updateOrderDetail(List<OrderDetail> orderDetails) {
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "UPDATE orderdetails SET UnitPrice = ?, Quantity = ?, Discount = ? WHERE orderID = ? AND SKU = ?";
+            String sql = "UPDATE orderdetails SET Quantity = ?, Discount = ? WHERE orderID = ? AND SKU = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             for (OrderDetail od : orderDetails) {
-                stmt.setDouble(1, od.getUnitPrice());
-                stmt.setInt(2, od.getQuantity());
-                stmt.setDouble(3, od.getDiscount());
-                stmt.setInt(4, od.getOrderID());
-                stmt.setString(5, od.getSKU());
+                stmt.setInt(1, od.getQuantity());
+                stmt.setDouble(2, od.getDiscount());
+                stmt.setInt(3, od.getOrderID());
+                stmt.setString(4, od.getSKU());
                 stmt.addBatch();
             }
-            stmt.executeBatch();
+
+            int[] result = stmt.executeBatch();
+            for (int res : result) {
+                if (res == Statement.EXECUTE_FAILED) {
+                    return false; // Nếu có ít nhất một câu lệnh không thành công
+                }
+            }
+            return true;
         } catch (SQLException ex) {
             Logger.getLogger(OrderServices.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 }
