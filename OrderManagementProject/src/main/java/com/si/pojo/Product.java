@@ -15,10 +15,10 @@ public class Product {
     private float unitPrice;
     private int minStockLevel;
 
-    public Product(String SKU, String ProductName, int StockQuanity, float UnitPrice, int MinStockLevel) {
+    public Product(String SKU, String ProductName, int StockQuantity, float UnitPrice, int MinStockLevel) {
         this.SKU = SKU;
         this.productName = ProductName;
-        this.stockQuantity = StockQuanity;
+        this.stockQuantity = StockQuantity;
         this.unitPrice = UnitPrice;
         this.minStockLevel = MinStockLevel;
     }
