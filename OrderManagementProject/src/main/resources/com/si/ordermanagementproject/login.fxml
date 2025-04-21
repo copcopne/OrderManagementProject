@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
@@ -12,11 +13,10 @@
             <Insets left="50.0" right="50.0" top="15.0" />
          </VBox.margin>
       </TextField>
-      <TextField fx:id="passwordField" promptText="Mật Khẩu">
+      <PasswordField fx:id="passwordField" promptText="Mật khẩu">
          <VBox.margin>
             <Insets left="50.0" right="50.0" top="15.0" />
-         </VBox.margin>
-      </TextField>
+         </VBox.margin></PasswordField>
       <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#LoginHandler" prefHeight="33.0" prefWidth="88.0" text="Đăng nhập" textAlignment="CENTER">
          <VBox.margin>
             <Insets top="20.0" />

@@ -9,11 +9,19 @@ package com.si.pojo;
  * @author copcopne
  */
 public class User {
+
     private int id;
+    private String fullName;
     private String username;
     private String password;
-    private String fullName;
-    private boolean isActive;
+    private boolean isAdmin;
+
+    public User(int id, String fullName, String username, boolean isAdmin) {
+        this.id = id;
+        this.fullName = fullName;
+        this.username = username;
+        this.isAdmin = isAdmin;
+    }
 
     /**
      * @return the id
@@ -72,16 +80,16 @@ public class User {
     }
 
     /**
-     * @return the isActive
+     * @return the isAdmin
      */
-    public boolean isIsActive() {
-        return isActive;
+    public boolean getIsAdmin() {
+        return isAdmin;
     }
 
     /**
-     * @param isActive the isActive to set
+     * @param isAdmin the isAdmin to set
      */
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }
