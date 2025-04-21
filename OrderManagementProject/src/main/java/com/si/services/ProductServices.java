@@ -39,7 +39,6 @@ public class ProductServices {
                         rs.getInt("StockQuantity"),
                         rs.getFloat("UnitPrice"),
                         rs.getInt("MinStockLevel"));
-
                 results.add(q);
             }
 
