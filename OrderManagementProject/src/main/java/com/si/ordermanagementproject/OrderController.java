@@ -31,8 +31,6 @@ public class OrderController implements Initializable {
     @FXML
     private TableView<Order> tbOrder;
     @FXML
-    private TableView<OrderDetail> tbOrderDetail;
-    @FXML
     private TextField txtSearch;
     @FXML
     private ComboBox<OrderStatus> cbStatus;
@@ -163,14 +161,13 @@ public class OrderController implements Initializable {
         stage.setTitle("Chi tiết đơn hàng #" + orderID);
 
         TableView<OrderDetail> tableView = new TableView<>();
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         TableColumn colSKU = new TableColumn<>("SKU");
-        TableColumn colUnitPrice = new TableColumn<>("Đơn giá");
         TableColumn colQuantity = new TableColumn<>("Số lượng");
         TableColumn colDiscount = new TableColumn<>("Giảm giá");
         colSKU.setCellValueFactory(new PropertyValueFactory<>("SKU"));
 
-        tableView.getColumns().addAll(colSKU, colUnitPrice, colQuantity, colDiscount);
-        colUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        tableView.getColumns().addAll(colSKU, colQuantity, colDiscount);
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
 
@@ -201,7 +198,7 @@ public class OrderController implements Initializable {
 
             loadData(txtSearch.getText(), cbStatus.getValue()); // Refresh bảng sau khi chỉnh sửa
         } catch (IOException e) {
-            e.printStackTrace();
+            Utils.getAlert("Không thể mở cửa sổ chỉnh sửa đơn hàng").show();
         }
 
     }

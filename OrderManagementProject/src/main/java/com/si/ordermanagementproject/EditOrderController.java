@@ -89,6 +89,12 @@ public class EditOrderController implements Initializable {
 
     @FXML
     private void handleSave() {
+        String shipAddress = txtShipAddress.getText().trim();
+
+        if (shipAddress.isEmpty()) {
+            Utils.getAlert("Địa chỉ giao hàng không được để trống").show();
+            return;
+        }
         this.currentOrder.setShipAddress(txtShipAddress.getText());
 
         // Cập nhật địa chỉ giao hàng
