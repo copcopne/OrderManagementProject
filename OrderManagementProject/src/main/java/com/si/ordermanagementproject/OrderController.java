@@ -170,6 +170,17 @@ public class OrderController implements Initializable {
         tableView.getColumns().addAll(colSKU, colQuantity, colDiscount);
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
+        colDiscount.setCellFactory(column -> new TableCell<OrderDetail, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f%%", item * 100));
+                }
+            }
+        });
 
         // Lấy dử liệu của Order Detail
         OrderServices os = new OrderServices();
