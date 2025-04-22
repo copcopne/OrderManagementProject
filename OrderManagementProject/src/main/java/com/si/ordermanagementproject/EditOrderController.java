@@ -64,43 +64,51 @@ public class EditOrderController implements Initializable {
             @Override
             public Integer fromString(String value) {
                 try {
-                    return super.fromString(value.trim());
+                    int val = Integer.parseInt(value.trim());
+                    if (val <= 0) {
+                        throw new NumberFormatException();
+                    }
+                    return val;
                 } catch (NumberFormatException e) {
                     Utils.getAlert("Số lượng không hợp lệ! Vui lòng nhập số nguyên > 0.").show();
-                    return null;
+                    // Ném lỗi để JavaFX không gọi onEditCommit
+                    throw new RuntimeException(e);
                 }
             }
         }));
         colQuantity.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Integer newValue = event.getNewValue();
-            if (newValue == null || newValue <= 0) {
-                Utils.getAlert("Số lượng không hợp lệ! Vui lòng nhập số nguyên > 0.").show();
-                tbOrderDetails.refresh();
-                return;
-            }
             od.setQuantity(newValue);
         });
 
-        colDiscount.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter(){
+        colDiscount.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter() {
             @Override
-            public Double fromString(String value) {
+            public String toString(Double value) {
+                if (value == null) {
+                    return "";
+                }
+                return String.format("%.2f%%", value * 100);
+            }
+
+            @Override
+            public Double fromString(String string) {
                 try {
-                    return super.fromString(value.trim());
+                    string = string.trim().replace("%", "");
+                    double val = Double.parseDouble(string) / 100.0;
+                    if (val < 0 || val > 1) {
+                        throw new NumberFormatException();
+                    }
+                    return val;
                 } catch (NumberFormatException e) {
-                    Utils.getAlert("Giảm giá không hợp lệ! Vui lòng nhập số thực trong khoảng 0 - 1").show();
-                    return null;
+                    Utils.getAlert("Giảm giá không hợp lệ! Vui lòng nhập số từ 0 đến 100").show();
+                    throw new RuntimeException(e);
                 }
             }
         }));
         colDiscount.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Double newValue = event.getNewValue();
-            if (newValue == null || newValue < 0 || newValue > 1) {
-                Utils.getAlert("Giảm giá không hợp lệ! Vui lòng nhập số thực trong khoảng 0 - 1").show();
-                tbOrderDetails.refresh();
-                return;
-            }
             od.setDiscount(newValue);
         });
 
