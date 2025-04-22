@@ -60,7 +60,17 @@ public class EditOrderController implements Initializable {
         colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
 
         // Cho phép chỉnh sửa
-        colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.IntegerStringConverter()));
+        colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.IntegerStringConverter() {
+            @Override
+            public Integer fromString(String value) {
+                try {
+                    return super.fromString(value.trim());
+                } catch (NumberFormatException e) {
+                    Utils.getAlert("Số lượng không hợp lệ! Vui lòng nhập số nguyên > 0.").show();
+                    return null;
+                }
+            }
+        }));
         colQuantity.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Integer newValue = event.getNewValue();
@@ -72,7 +82,17 @@ public class EditOrderController implements Initializable {
             od.setQuantity(newValue);
         });
 
-        colDiscount.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
+        colDiscount.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter(){
+            @Override
+            public Double fromString(String value) {
+                try {
+                    return super.fromString(value.trim());
+                } catch (NumberFormatException e) {
+                    Utils.getAlert("Giảm giá không hợp lệ! Vui lòng nhập số thực trong khoảng 0 - 1").show();
+                    return null;
+                }
+            }
+        }));
         colDiscount.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Double newValue = event.getNewValue();
