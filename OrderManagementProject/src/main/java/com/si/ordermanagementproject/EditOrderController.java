@@ -64,8 +64,8 @@ public class EditOrderController implements Initializable {
         colQuantity.setOnEditCommit(event -> {
             OrderDetail od = event.getRowValue();
             Integer newValue = event.getNewValue();
-            if (newValue == null || newValue < 0) {
-                Utils.getAlert("Số lượng không hợp lệ! Vui lòng nhập số nguyên ≥ 0.").show();
+            if (newValue == null || newValue <= 0) {
+                Utils.getAlert("Số lượng không hợp lệ! Vui lòng nhập số nguyên > 0.").show();
                 tbOrderDetails.refresh();
                 return;
             }
