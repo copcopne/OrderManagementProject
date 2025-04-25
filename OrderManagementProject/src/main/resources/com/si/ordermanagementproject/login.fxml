@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="400.0" styleClass="v-box" stylesheets="@Styles/Login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.si.ordermanagementproject.LoginController">
+<VBox fx:id="loginVBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="400.0" styleClass="v-box" stylesheets="@Styles/Login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.si.ordermanagementproject.LoginController">
    <children>
       <Label text="Đăng nhập vào hệ thống" />
       <TextField fx:id="usernameField" promptText="Tên người dùng" styleClass="text-field">
