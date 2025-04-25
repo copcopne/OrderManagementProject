@@ -25,9 +25,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 /**
  * FXML Controller class
@@ -59,7 +57,7 @@ public class EditUserController implements Initializable {
     @FXML
     private Button resetPassword;
 
-    UserSession session = UserSession.getInstance();
+    private final UserSession session = UserSession.getInstance();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -166,12 +164,12 @@ public class EditUserController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editPassword.fxml"));
             Parent root = fxmlLoader.load();
-            root.setStyle("-fx-border-color: #999999; -fx-border-width: 2px; -fx-border-radius: 5px;");
 
             Stage stage = new Stage();
+            stage.setTitle("Chỉnh sửa mật khẩu");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED);
+            stage.initOwner(ok.getScene().getWindow());
+            stage.setResizable(false);
             stage.setOnHidden(e -> {
                 this.ok.getScene().getWindow().hide();
             });

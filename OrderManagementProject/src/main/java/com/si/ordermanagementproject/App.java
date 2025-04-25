@@ -15,18 +15,22 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
-        primaryStage.setTitle("Quản lý đơn hàng");
-        primaryStage.setResizable(false);
-
-        // Gọi cửa sổ đăng nhập từ LoginStage
+        
         LoginStage.showLoginStage(primaryStage, this);
     }
 
-    // Hiển thị cửa sổ chính sau khi đăng nhập thành công
     public void showMainStage() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("userManagement.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("mainApp.fxml"));
         Parent root = loader.load();
-        primaryStage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets()
+                .add(getClass()
+                .getResource("/com/si/ordermanagementproject/Styles/MainApp.css")
+                .toExternalForm());
+        primaryStage.setTitle("Quản lý đơn hàng");
+        primaryStage.setMaximized(true);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
