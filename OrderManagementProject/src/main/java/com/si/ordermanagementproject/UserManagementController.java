@@ -30,6 +30,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -88,6 +89,7 @@ public class UserManagementController implements Initializable {
                         stage.setTitle("Chỉnh sửa người dùng #" + selectedUser.getId());
                         stage.setScene(new Scene(root));
                         stage.initOwner(addBtn.getScene().getWindow());
+                        stage.initModality(Modality.WINDOW_MODAL);
                         stage.setResizable(false);
                         
                         stage.setOnHidden(e -> {
@@ -175,6 +177,7 @@ public class UserManagementController implements Initializable {
             stage.setTitle("Thêm người dùng mới");
             stage.setScene(new Scene(root));
             stage.initOwner(addBtn.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
             stage.setResizable(false);
             stage.setOnHidden(e -> {
                 loadTableData("");

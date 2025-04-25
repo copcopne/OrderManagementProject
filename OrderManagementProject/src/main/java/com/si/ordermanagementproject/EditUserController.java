@@ -25,6 +25,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -63,7 +64,6 @@ public class EditUserController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         if (!session.isLoggedIn()) {
             Utils.getAlert("Bạn chưa đăng nhập").showAndWait();
-            ok.getScene().getWindow().hide();
         } else {
             passwordTxt.setDisable(true);
             passwordTxt.setVisible(false);
@@ -124,11 +124,13 @@ public class EditUserController implements Initializable {
                 if (rs == true) {
 //                    User thisUser = s.findUserByUsername(usernameTxt.getText());
 //                    session.login(thisUser);
-                    if (!session.getIsAdmin() || session.getUsername().equals(usernameTxt.getText())) {
-                        User thisUser = s.findUserByUsername(usernameTxt.getText());
-                        session.login(thisUser);
-                    }
-                    Utils.getAlert("Cập nhật thành công!").showAndWait();
+                    if (session.getUsername().equals(currentUsername)) {
+                        session.logout();
+                        Utils.getAlert("Cập nhật thành công! Vui lòng đăng nhập lại để có hiệu lực.").showAndWait();
+                        Utils.showLogin();
+                    } else
+                        Utils.getAlert("Cập nhật thành công!").showAndWait();
+                    
                     ok.getScene().getWindow().hide();
                 }
             } catch (IllegalArgumentException ex) {
@@ -169,10 +171,11 @@ public class EditUserController implements Initializable {
             stage.setTitle("Chỉnh sửa mật khẩu");
             stage.setScene(new Scene(root));
             stage.initOwner(ok.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
             stage.setResizable(false);
-            stage.setOnHidden(e -> {
-                this.ok.getScene().getWindow().hide();
-            });
+//            stage.setOnHidden(e -> {
+//                this.ok.getScene().getWindow().hide();
+//            });
             stage.show();
 
         } catch (IOException e) {

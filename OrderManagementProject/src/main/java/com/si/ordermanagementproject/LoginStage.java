@@ -20,7 +20,7 @@ public class LoginStage {
         FXMLLoader loader = new FXMLLoader(LoginStage.class.getResource("login.fxml"));
         Parent root = loader.load();
         Stage loginStage = new Stage();
-        loginStage.setTitle("Đăng nhập vào hệ thống");
+        loginStage.setTitle("Đăng nhập");
         loginStage.setResizable(false);
         loginStage.setScene(new Scene(root));
 

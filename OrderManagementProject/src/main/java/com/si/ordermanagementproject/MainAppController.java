@@ -21,6 +21,7 @@ import java.util.ResourceBundle;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MainAppController implements Initializable {
@@ -54,7 +55,6 @@ public class MainAppController implements Initializable {
         contentLb.setText("Chào mừng, " + session.getUsername());
         setupMenu();
         preloadViews();
-        switchView("Welcome");
     }
 
     private void setupMenu() {
@@ -151,7 +151,7 @@ public class MainAppController implements Initializable {
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                }
+            }
             }
         });
     }
@@ -168,6 +168,7 @@ public class MainAppController implements Initializable {
             stage.setTitle("Chỉnh sửa tài khoản cá nhân");
             stage.setScene(new Scene(root));
             stage.initOwner(mainContent.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
             stage.setResizable(false);
             stage.show();
         } catch (IOException ex) {

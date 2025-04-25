@@ -87,8 +87,9 @@ public class EditPasswordController implements Initializable {
                     UserServices s = new UserServices();
                     s.updateUser(currentUserUsername, null, null, newP, null);
 
-                    Utils.getAlert("Cập nhật mật khẩu thành công!").showAndWait();
-                    this.ok.getScene().getWindow().hide();
+                    Utils.getAlert("Cập nhật mật khẩu thành công! Vui lòng đăng nhập lại để có hiệu lực.").showAndWait();
+                    UserSession.getInstance().logout();
+                    Utils.showLogin();
 
                 } catch (IllegalArgumentException ex) {
                     Utils.getAlert("LỖI dữ liệu đầu vào: " + ex.getMessage()).show();
