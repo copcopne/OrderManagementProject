@@ -33,7 +33,6 @@ public class App extends Application {
                         .toExternalForm());
         primaryStage.setTitle("Quản lý đơn hàng");
         primaryStage.setMaximized(true);
-        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(eh -> {
             Alert confirm = Utils.getConfirmAlert("Bạn có chắc muốn thoát không?");
