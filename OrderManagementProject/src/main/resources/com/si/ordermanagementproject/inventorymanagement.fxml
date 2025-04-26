@@ -31,7 +31,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </VBox.margin>
       </HBox>
-      <TableView fx:id="tbProducts" prefHeight="514.0" prefWidth="645.0">
+      <TableView fx:id="tbProducts" prefHeight="514.0" prefWidth="645.0" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </VBox.margin></TableView>
