@@ -24,6 +24,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class OrderController implements Initializable {
@@ -205,6 +206,8 @@ public class OrderController implements Initializable {
             Stage stage = new Stage();
             stage.setTitle("Chỉnh sửa đơn hàng #" + orderID);
             stage.setScene(new Scene(root));
+            stage.initOwner(txtSearch.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
             stage.showAndWait();
 
             loadData(txtSearch.getText(), cbStatus.getValue()); // Refresh bảng sau khi chỉnh sửa

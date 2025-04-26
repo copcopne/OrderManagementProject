@@ -5,6 +5,9 @@
 package com.si.ordermanagementproject;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,6 +16,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  *
@@ -74,5 +78,13 @@ public class Utils {
 
         return alert;
     }
-    
+    public static void showLogin() {
+    try {
+        App.primaryStage.hide();
+        LoginStage.showLoginStage(new Stage(), new App());
+    } catch (IOException ex) {
+        Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}
+
 }

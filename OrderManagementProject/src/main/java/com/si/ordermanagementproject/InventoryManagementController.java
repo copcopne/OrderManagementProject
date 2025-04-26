@@ -23,7 +23,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class InventoryManagementController implements Initializable {
@@ -70,9 +69,11 @@ public class InventoryManagementController implements Initializable {
                 Parent root = fxmlLoader.load();
 
                 Stage stage = new Stage();
+                stage.setTitle("Nhập hàng");
                 stage.setScene(new Scene(root));
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.initStyle(StageStyle.UTILITY);
+                stage.initOwner(importBtn.getScene().getWindow());
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.setResizable(false);
                 stage.setOnHidden(e -> {
                     loadData("");
                 });
@@ -88,9 +89,11 @@ public class InventoryManagementController implements Initializable {
                 Parent root = fxmlLoader.load();
 
                 Stage stage = new Stage();
+                stage.setTitle("Xuất hàng");
                 stage.setScene(new Scene(root));
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.initStyle(StageStyle.UTILITY);
+                stage.initOwner(deductBtn.getScene().getWindow());
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.setResizable(false);
                 stage.setOnHidden(e -> {
                     loadData("");
                 });

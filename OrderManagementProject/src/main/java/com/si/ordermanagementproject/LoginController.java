@@ -4,17 +4,36 @@ import com.si.pojo.UserSession;
 import com.si.pojo.User;
 import com.si.services.AuthServices;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class LoginController {
-    
+    @FXML private VBox loginVBox;
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     private Stage loginStage;
     private App mainApp;
+    
+    @FXML
+    public void initialize() {
+        loginVBox.setOnKeyPressed(this::handleKeyPressed);
+    }
+    
+    private void handleKeyPressed(KeyEvent event) {
+        if (event.getCode().toString().equals("ENTER")) {
+            try {
+                LoginHandler();
+            } catch (IOException ex) {
+                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     @FXML
     private void LoginHandler() throws IOException {

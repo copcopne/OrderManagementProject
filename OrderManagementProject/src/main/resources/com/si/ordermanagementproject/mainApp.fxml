@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="600" prefWidth="1000" stylesheets="@Styles/MainApp.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.si.ordermanagementproject.MainAppController">
+
+    <!-- MENU TRÁI - 40% -->
+    <left>
+        <VBox fx:id="menuVBox" alignment="TOP_LEFT" prefWidth="250" spacing="20" BorderPane.alignment="CENTER">
+            <!-- Logo / Brand -->
+            <VBox fx:id="menuHeader" alignment="CENTER_LEFT" spacing="10">
+                <!-- Label logo hoặc HBox chứa icon -->
+            </VBox>
+
+            <!-- Nhóm chức năng chính -->
+            <VBox fx:id="menuGroupContainer" spacing="10">
+                <!-- Các nhóm menu thêm bằng code -->
+            </VBox>
+
+            <!-- Settings -->
+            <VBox fx:id="menuFooter" alignment="BOTTOM_LEFT" spacing="10" VBox.vgrow="ALWAYS">
+                <!-- Settings & What's new -->
+            </VBox>
+        </VBox>
+    </left>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="contentLb" text="Label">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <StackPane fx:id="mainContent" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+   </center>
+
+</BorderPane>

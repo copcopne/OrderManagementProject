@@ -32,7 +32,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 /**
  * FXML Controller class
@@ -82,15 +81,17 @@ public class UserManagementController implements Initializable {
                     try {
                         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editUser.fxml"));
                         Parent root = fxmlLoader.load();
-                        root.setStyle("-fx-border-color: #999999; -fx-border-width: 2px; -fx-border-radius: 5px;");
 
                         EditUserController controller = fxmlLoader.getController();
                         controller.setUserData(selectedUser);
 
                         Stage stage = new Stage();
+                        stage.setTitle("Chỉnh sửa người dùng #" + selectedUser.getId());
                         stage.setScene(new Scene(root));
-                        stage.initModality(Modality.APPLICATION_MODAL);
-                        stage.initStyle(StageStyle.UNDECORATED);
+                        stage.initOwner(addBtn.getScene().getWindow());
+                        stage.initModality(Modality.WINDOW_MODAL);
+                        stage.setResizable(false);
+                        
                         stage.setOnHidden(e -> {
                             loadTableData("");
                         });
@@ -171,12 +172,13 @@ public class UserManagementController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("addUser.fxml"));
             Parent root = fxmlLoader.load();
-            root.setStyle("-fx-border-color: #999999; -fx-border-width: 2px; -fx-border-radius: 5px;");
 
             Stage stage = new Stage();
+            stage.setTitle("Thêm người dùng mới");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED);
+            stage.initOwner(addBtn.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setResizable(false);
             stage.setOnHidden(e -> {
                 loadTableData("");
             });

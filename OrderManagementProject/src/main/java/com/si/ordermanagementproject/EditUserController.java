@@ -27,7 +27,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 /**
  * FXML Controller class
@@ -59,13 +58,12 @@ public class EditUserController implements Initializable {
     @FXML
     private Button resetPassword;
 
-    UserSession session = UserSession.getInstance();
+    private final UserSession session = UserSession.getInstance();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         if (!session.isLoggedIn()) {
             Utils.getAlert("Bạn chưa đăng nhập").showAndWait();
-            ok.getScene().getWindow().hide();
         } else {
             passwordTxt.setDisable(true);
             passwordTxt.setVisible(false);
@@ -126,11 +124,13 @@ public class EditUserController implements Initializable {
                 if (rs == true) {
 //                    User thisUser = s.findUserByUsername(usernameTxt.getText());
 //                    session.login(thisUser);
-                    if (!session.getIsAdmin() || session.getUsername().equals(usernameTxt.getText())) {
-                        User thisUser = s.findUserByUsername(usernameTxt.getText());
-                        session.login(thisUser);
-                    }
-                    Utils.getAlert("Cập nhật thành công!").showAndWait();
+                    if (session.getUsername().equals(currentUsername)) {
+                        session.logout();
+                        Utils.getAlert("Cập nhật thành công! Vui lòng đăng nhập lại để có hiệu lực.").showAndWait();
+                        Utils.showLogin();
+                    } else
+                        Utils.getAlert("Cập nhật thành công!").showAndWait();
+                    
                     ok.getScene().getWindow().hide();
                 }
             } catch (IllegalArgumentException ex) {
@@ -166,15 +166,16 @@ public class EditUserController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editPassword.fxml"));
             Parent root = fxmlLoader.load();
-            root.setStyle("-fx-border-color: #999999; -fx-border-width: 2px; -fx-border-radius: 5px;");
 
             Stage stage = new Stage();
+            stage.setTitle("Chỉnh sửa mật khẩu");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.setOnHidden(e -> {
-                this.ok.getScene().getWindow().hide();
-            });
+            stage.initOwner(ok.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setResizable(false);
+//            stage.setOnHidden(e -> {
+//                this.ok.getScene().getWindow().hide();
+//            });
             stage.show();
 
         } catch (IOException e) {
